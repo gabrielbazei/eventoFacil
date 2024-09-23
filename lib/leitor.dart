@@ -17,17 +17,9 @@ class _BarcodeScannerSimpleState extends State<BarcodeScannerSimple> {
 
   Widget test(BuildContext context) {
     if (_barcode != null) {
-      // Salvar o código se necessário
       salvarCodigo(_barcode?.displayValue);
-
-      // Voltar para a tela anterior ou navegar para a nova tela
-      /*Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => NavigationExample()),
-      );*/
+      // TODO: verificar uma maneira melhor de voltar para a tela inicial, caso não encontre, validar se o ID do aluno ja pertence a lista de alunos daquele evento
       Navigator.pop(context);
-      // Retornar um widget vazio enquanto navega
-      return Container(); // ou qualquer outro widget que faça sentido aqui
     }
 
     // Retorna o widget quando _barcode é nulo

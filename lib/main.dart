@@ -1,3 +1,4 @@
+import 'package:eventofacil/gerar.dart';
 import 'package:eventofacil/leitor.dart';
 import 'package:flutter/material.dart';
 
@@ -68,19 +69,34 @@ class _NavigationExampleState extends State<NavigationExample> {
         /// Area de QRcode
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: SizedBox(
-            child: Center(
-              child: ElevatedButton(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
+                child: ElevatedButton(
+                    onPressed: () {
+                      //Navega para a tela de leitura de QR code
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BarcodeScannerSimple()),
+                      );
+                    },
+                    child: const Text('Abrir Leitor de QR Code')),
+              ),
+              const SizedBox(
+                height: 50,
+              ),
+              ElevatedButton(
                   onPressed: () {
                     //Navega para a tela de leitura de QR code
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => BarcodeScannerSimple()),
+                      MaterialPageRoute(builder: (context) => GenerateQRCode()),
                     );
                   },
-                  child: const Text('Abrir Leitor de QR Code')),
-            ),
+                  child: const Text('Mostrar QR code')),
+            ],
           ),
         ),
 
