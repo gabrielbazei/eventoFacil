@@ -1,4 +1,4 @@
-import 'package:eventofacil/main.dart';
+/*import 'package:eventofacil/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -78,4 +78,4 @@ class _BarcodeScannerSimpleState extends State<BarcodeScannerSimple> {
       ),
     );
   }
-}
+}*/

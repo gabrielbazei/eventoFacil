@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class GenerateQRCode extends StatefulWidget {
@@ -36,4 +36,4 @@ class GenerateQRCodeState extends State<GenerateQRCode> {
       ]),
     );
   }
-}
+}*/
