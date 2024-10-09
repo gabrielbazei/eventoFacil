@@ -11,13 +11,7 @@
 migrate_working_dir/
 /.dart_tool/
 /.idea/
-/android/
-/build/
-/ios/
-/linux/
-/macos/
-/web/
-/windows/
+/lib/deprecated
 
 # IntelliJ related
 *.iml

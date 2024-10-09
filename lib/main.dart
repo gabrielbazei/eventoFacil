@@ -1,5 +1,4 @@
 import 'package:eventofacil/view/login_view.dart';
-import 'package:eventofacil/view/navigation_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,8 +13,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      //home: const LoginPage(), // Define a tela de login como a tela inicial
-      home: const NavigationExample(),
+      home: const LoginPage(), // Define a tela de login como a tela inicial
     );
   }
 }
