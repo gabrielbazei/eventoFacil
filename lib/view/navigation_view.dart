@@ -55,7 +55,7 @@ class _NavigationExampleState extends State<NavigationExample>
       case 0:
         return _buildEventPage();
       case 1:
-        return _buildQrCodePage();
+        return _buildWallet();
       case 2:
         return _buildProfilePage();
       default:
@@ -92,7 +92,7 @@ class _NavigationExampleState extends State<NavigationExample>
   List<Widget> _buildEventItems(List<Event> events) {
     return events.map((event) {
       return Container(
-        width: double.infinity, // Largura responsiva
+        width: double.infinity,
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         child: InkWell(
           onTap: () {
@@ -116,6 +116,43 @@ class _NavigationExampleState extends State<NavigationExample>
                     event.description,
                     style: const TextStyle(fontSize: 16),
                   ),
+                  const SizedBox(height: 8.0),
+                  // Verifica se o usuário é admin para exibir os botões apropriados
+                  if (event.isAdmin) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            _presenter.onEditEvent(event);
+                          },
+                          child: const Text('Editar'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => BarcodeScannerSimple()),
+                            );
+                          },
+                          child: const Text('Abrir Leitor de QR Code'),
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            _presenter.onJoinEvent(event);
+                          },
+                          child: const Text('Participar'),
+                        ),
+                      ],
+                    )
+                  ],
                 ],
               ),
             ),
@@ -125,33 +162,78 @@ class _NavigationExampleState extends State<NavigationExample>
     }).toList();
   }
 
-  Widget _buildQrCodePage() {
+  Widget _buildWallet() {
+    final events = _presenter
+        .getSubscribedEvents(); // Supondo que há um método que retorna os eventos em que o usuário está inscrito.
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BarcodeScannerSimple()),
+          const Text(
+            'Eventos Inscritos',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView.builder(
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                final event = events[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          event.title,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          event.description,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                _presenter.onCancelEvent(event);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors
+                                    .red, // Cor diferenciada para o botão de cancelamento
+                              ),
+                              child: const Text('Cancelar Ingresso'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Lógica para visualizar o QR Code do ingresso
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        BarcodeScannerSimple(),
+                                  ),
+                                );
+                              },
+                              child: const Text('Visualizar Ingresso'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               },
-              child: const Text('Abrir Leitor de QR Code'),
             ),
-          ),
-          const SizedBox(height: 50),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => GenerateQRCode()),
-              );
-            },
-            child: const Text('Mostrar QR code'),
           ),
         ],
       ),
@@ -159,11 +241,136 @@ class _NavigationExampleState extends State<NavigationExample>
   }
 
   Widget _buildProfilePage() {
-    return const Padding(
-      padding: EdgeInsets.all(8.0),
-      child: SizedBox(
-        child: Center(
-          child: Text('Área do perfil'),
+    final _formKey = GlobalKey<FormState>();
+    String? _phone;
+    String? _address;
+    String? _number;
+    String? _city;
+    String? _birthDate;
+    String? _selectedGender;
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextFormField(
+              decoration: const InputDecoration(
+                labelText: 'Telefone',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.phone,
+              onSaved: (value) {
+                _phone = value;
+              },
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Endereço',
+                      border: OutlineInputBorder(),
+                    ),
+                    onSaved: (value) {
+                      _address = value;
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 1,
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Número',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    onSaved: (value) {
+                      _number = value;
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                labelText: 'Cidade',
+                border: OutlineInputBorder(),
+              ),
+              onSaved: (value) {
+                _city = value;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                labelText: 'Data de Nascimento',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.datetime,
+              onSaved: (value) {
+                _birthDate = value;
+              },
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(
+                labelText: 'Gênero',
+                border: OutlineInputBorder(),
+              ),
+              value: _selectedGender,
+              items: const [
+                DropdownMenuItem(value: 'F', child: Text('Feminino')),
+                DropdownMenuItem(value: 'M', child: Text('Masculino')),
+              ],
+              onChanged: (value) {
+                _selectedGender = value;
+              },
+            ),
+            const SizedBox(height: 32),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState?.validate() ?? false) {
+                      _formKey.currentState?.save();
+                      // Salvar as informações aqui
+                      print(
+                          'Salvando informações: Telefone: $_phone, Endereço: $_address, Número: $_number, Cidade: $_city, Data de Nascimento: $_birthDate, Gênero: $_selectedGender');
+                    }
+                  },
+                  child: const Text('Salvar'),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    // Lógica para sair do perfil
+                    print('Saindo...');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Colors.red, // Cor para diferenciar o botão de sair
+                  ),
+                  child: const Text('Sair'),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () {
+                    // Lógica para alterar a senha
+                    print('Alterar Senha');
+                  },
+                  child: const Text('Alterar Senha'),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
