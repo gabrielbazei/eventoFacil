@@ -1,3 +1,4 @@
+import 'package:eventofacil/deprecated/event.dart';
 import 'package:eventofacil/model/navigation_model.dart';
 import 'package:eventofacil/presenter/navigation_presenter.dart';
 import 'package:eventofacil/view/gerador_view.dart';
@@ -96,7 +97,7 @@ class _NavigationExampleState extends State<NavigationExample>
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         child: InkWell(
           onTap: () {
-            _presenter.onEventSelected(event.title);
+            _presenter.onEventSelected(context, event);
           },
           child: Card(
             child: Padding(
@@ -122,12 +123,12 @@ class _NavigationExampleState extends State<NavigationExample>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        TextButton(
+                        /*TextButton(
                           onPressed: () {
-                            _presenter.onEditEvent(event);
+                            _presenter.onEditEvent(context, event);
                           },
                           child: const Text('Editar'),
-                        ),
+                        ),*/
                         TextButton(
                           onPressed: () {
                             Navigator.push(
@@ -219,8 +220,7 @@ class _NavigationExampleState extends State<NavigationExample>
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        BarcodeScannerSimple(),
+                                    builder: (context) => GenerateQRCode(),
                                   ),
                                 );
                               },

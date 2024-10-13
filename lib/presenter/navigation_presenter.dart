@@ -1,4 +1,6 @@
 import 'package:eventofacil/model/navigation_model.dart';
+import 'package:eventofacil/view/event_view.dart';
+import 'package:flutter/material.dart';
 
 abstract class NavigationView {
   void updateView(int index);
@@ -42,14 +44,25 @@ class NavigationPresenter {
     view.updateView(index);
   }
 
-  void onEventSelected(String eventTitle) {
-    print('$eventTitle clicado!');
+  void onEventSelected(context, Event event) {
+    print('${event.title} clicado!');
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => EventoScreen(
+                  evento: event,
+                )));
   }
-
-  void onEditEvent(Event event) {
+  /*void onEditEvent(context, Event event) {
     print('Editar ${event.title}');
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => EventoScreen(
+                  evento: event,
+                )));
     // Aqui você pode adicionar a lógica para a edição do evento
-  }
+  }*/
 
   void onJoinEvent(Event event) {
     print('Participar do ${event.title}');
