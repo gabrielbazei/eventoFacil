@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:eventofacil/view/navigation_view.dart';
-
 abstract class LoginView {
   void showLoginError();
   void navigateToDashboard();

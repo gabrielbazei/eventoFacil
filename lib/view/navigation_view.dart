@@ -1,4 +1,3 @@
-import 'package:eventofacil/deprecated/event.dart';
 import 'package:eventofacil/model/navigation_model.dart';
 import 'package:eventofacil/presenter/navigation_presenter.dart';
 import 'package:eventofacil/view/gerador_view.dart';
@@ -22,6 +21,7 @@ class _NavigationExampleState extends State<NavigationExample>
     _presenter = NavigationPresenter(this);
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,13 +73,33 @@ class _NavigationExampleState extends State<NavigationExample>
         child: Center(
           child: Column(
             children: [
-              const Text(
-                maxLines: 1,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
-                ),
-                'Área de eventos',
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Área de eventos',
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30,
+                    ),
+                  ),
+                  Container(
+                    margin:
+                        const EdgeInsets.only(right: 8.0), // Ajuste de margem
+                    decoration: const BoxDecoration(
+                        color: Colors.blue, shape: BoxShape.circle),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.add,
+                        color: Colors.black,
+                      ),
+                      onPressed: () {
+                        _presenter.onCreateEvent();
+                      },
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 20), // Espaçamento entre o título e o menu
               ..._buildEventItems(events.cast<Event>()),

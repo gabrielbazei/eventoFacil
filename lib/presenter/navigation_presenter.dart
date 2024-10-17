@@ -74,4 +74,8 @@ class NavigationPresenter {
   }
 
   List<Event> getEvents() => events;
+
+  void onCreateEvent() {
+    print("Criando evento");
+  }
 }
