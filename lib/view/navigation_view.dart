@@ -95,7 +95,7 @@ class _NavigationExampleState extends State<NavigationExample>
                         color: Colors.black,
                       ),
                       onPressed: () {
-                        _presenter.onCreateEvent();
+                        _presenter.onCreateEvent(context);
                       },
                     ),
                   ),
@@ -138,30 +138,8 @@ class _NavigationExampleState extends State<NavigationExample>
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 8.0),
-                  // Verifica se o usuário é admin para exibir os botões apropriados
-                  if (event.isAdmin) ...[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        /*TextButton(
-                          onPressed: () {
-                            _presenter.onEditEvent(context, event);
-                          },
-                          child: const Text('Editar'),
-                        ),*/
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => BarcodeScannerSimple()),
-                            );
-                          },
-                          child: const Text('Abrir Leitor de QR Code'),
-                        ),
-                      ],
-                    ),
-                  ] else ...[
+                  // Verifica se o usuário não está inscrito para exibir o botão "Participar"
+                  if (!event.isSubscribed) ...[
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -172,7 +150,25 @@ class _NavigationExampleState extends State<NavigationExample>
                           child: const Text('Participar'),
                         ),
                       ],
-                    )
+                    ),
+                  ],
+                  if (event.isAdmin && event.isSubscribed) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BarcodeScannerSimple(),
+                              ),
+                            );
+                          },
+                          child: const Text('Abrir Leitor de QR Code'),
+                        ),
+                      ],
+                    ),
                   ],
                 ],
               ),

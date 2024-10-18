@@ -29,6 +29,7 @@ class BarcodeScannerPresenter {
 
   // Método para salvar o código (pode ser expandido para persistência no futuro)
   void salvarCodigo(String? codigo) {
+    //TODO enviar o codigo vindo do leitor para o banco
     print('Código salvo: $codigo');
   }
 

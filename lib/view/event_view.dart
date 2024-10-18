@@ -4,8 +4,11 @@ import '../presenter/event_presenter.dart';
 
 class EventoScreen extends StatefulWidget {
   final Event evento;
-
-  EventoScreen({required this.evento}); // Recebe o objeto Event pelo construtor
+  final bool isNew;
+  EventoScreen({
+    required this.evento,
+    required this.isNew,
+  }); // Recebe o objeto Event pelo construtor
 
   @override
   _EventoScreenState createState() => _EventoScreenState();
@@ -64,7 +67,12 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
               decoration: InputDecoration(labelText: 'Data Fim'),
             ),
             const SizedBox(height: 20),
-            if (widget.evento.isAdmin) ...[
+            if (widget.isNew) ...[
+              ElevatedButton(
+                onPressed: criarEvento,
+                child: Text('Salvar'),
+              ),
+            ] else if (widget.evento.isAdmin && !widget.isNew) ...[
               ElevatedButton(
                 onPressed: presenter.salvarEvento,
                 child: Text('Salvar'),
@@ -99,5 +107,13 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
   void mostrarMensagem(String mensagem) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(mensagem)));
+  }
+
+  void criarEvento() {
+    Event evento = new Event(isAdmin: true, isSubscribed: true);
+    evento.title = eventoController.text;
+    evento.description = descricaoController.text;
+    evento.location = localController.text;
+    presenter.adicionarEvento();
   }
 }

@@ -5,15 +5,13 @@ class EventoPresenter {
   Event evento;
 
   EventoPresenter(this.evento, this.view);
-
+  //Carrega os dados do evento para a view
   void carregarEvento() {
-    // Simula a carga de dados do evento.
     view.mostrarEvento(evento);
   }
 
   void salvarEvento() {
     // Lógica para salvar o evento
-    print("Evento salvo: ${evento.title}");
     view.mostrarMensagem('Evento salvo com sucesso!');
   }
 
@@ -22,6 +20,8 @@ class EventoPresenter {
     print("Evento apagado: ${evento.title}");
     view.mostrarMensagem('Evento apagado com sucesso!');
   }
+
+  void adicionarEvento() {}
 }
 
 // Interface para que a View possa implementar
