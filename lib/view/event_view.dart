@@ -6,7 +6,8 @@ class EventoScreen extends StatefulWidget {
   final Event evento;
   final bool isNew;
 
-  EventoScreen({
+  const EventoScreen({
+    super.key,
     required this.evento,
     required this.isNew,
   });
@@ -36,7 +37,7 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Evento'),
+        title: const Text('Evento'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -45,69 +46,69 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
             TextField(
               controller: eventoController,
               enabled: widget.evento.isAdmin,
-              decoration: InputDecoration(labelText: 'Evento'),
-              style: TextStyle(color: Colors.grey),
+              decoration: const InputDecoration(labelText: 'Evento'),
+              style: const TextStyle(color: Colors.grey),
             ),
             TextField(
               controller: localController,
               enabled: widget.evento.isAdmin,
-              decoration: InputDecoration(labelText: 'Local'),
-              style: TextStyle(color: Colors.grey),
+              decoration: const InputDecoration(labelText: 'Local'),
+              style: const TextStyle(color: Colors.grey),
             ),
             TextField(
               controller: descricaoController,
               enabled: widget.evento.isAdmin,
-              decoration: InputDecoration(labelText: 'Descrição'),
-              style: TextStyle(color: Colors.grey),
+              decoration: const InputDecoration(labelText: 'Descrição'),
+              style: const TextStyle(color: Colors.grey),
             ),
             TextField(
               controller: dataInicioController,
               enabled: widget.evento.isAdmin,
-              decoration: InputDecoration(labelText: 'Data Início'),
-              style: TextStyle(color: Colors.grey),
+              decoration: const InputDecoration(labelText: 'Data Início'),
+              style: const TextStyle(color: Colors.grey),
             ),
             TextField(
               controller: dataFimController,
               enabled: widget.evento.isAdmin,
-              decoration: InputDecoration(labelText: 'Data Fim'),
-              style: TextStyle(color: Colors.grey),
+              decoration: const InputDecoration(labelText: 'Data Fim'),
+              style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 20),
             if (widget.isNew) ...[
               ElevatedButton(
                 onPressed: criarEvento,
-                child: Text('Salvar'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white, // Cor do texto
-                  shape:
-                      RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  padding: EdgeInsets.all(16),
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero),
+                  padding: const EdgeInsets.all(16),
                 ),
+                child: const Text('Salvar'),
               ),
             ] else if (widget.evento.isAdmin && !widget.isNew) ...[
               ElevatedButton(
                 onPressed: presenter.salvarEvento,
-                child: Text('Salvar'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white, // Cor do texto
-                  shape:
-                      RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  padding: EdgeInsets.all(16),
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero),
+                  padding: const EdgeInsets.all(16),
                 ),
+                child: const Text('Salvar'),
               ),
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: presenter.onEventDelete,
-                child: Text('Apagar Evento'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white, // Cor do texto
-                  shape:
-                      RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  padding: EdgeInsets.all(16),
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero),
+                  padding: const EdgeInsets.all(16),
                 ),
+                child: const Text('Apagar Evento'),
               ),
             ],
           ],
@@ -134,7 +135,7 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
   }
 
   void criarEvento() {
-    Event evento = new Event(isAdmin: true, isSubscribed: true);
+    Event evento = Event(isAdmin: true, isSubscribed: true);
     evento.nomeEvento = eventoController.text;
     evento.descricao = descricaoController.text;
     evento.local = localController.text;

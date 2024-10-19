@@ -168,7 +168,8 @@ class _NavigationExampleState extends State<Dashboard>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => BarcodeScannerSimple(),
+                                builder: (context) =>
+                                    const BarcodeScannerSimple(),
                               ),
                             );
                           },
@@ -334,7 +335,8 @@ class _NavigationExampleState extends State<Dashboard>
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => GenerateQRCode(),
+                                        builder: (context) =>
+                                            const GenerateQRCode(),
                                       ),
                                     );
                                   },
@@ -361,30 +363,30 @@ class _NavigationExampleState extends State<Dashboard>
   }
 
   Widget _buildProfilePage() {
-    final _formKey = GlobalKey<FormState>();
-    String? _phone;
-    String? _address;
-    String? _number;
-    String? _city;
-    String? _birthDate;
-    String? _selectedGender;
+    final formKey = GlobalKey<FormState>();
+    String? phone;
+    String? address;
+    String? number;
+    String? city;
+    String? birthDate;
+    String? selectedGender;
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Form(
-        key: _formKey,
+        key: formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Telefone',
                 filled: true,
                 border: InputBorder.none,
               ),
               keyboardType: TextInputType.phone,
               onSaved: (value) {
-                _phone = value;
+                phone = value;
               },
             ),
             const SizedBox(height: 16),
@@ -393,13 +395,13 @@ class _NavigationExampleState extends State<Dashboard>
                 Expanded(
                   flex: 3,
                   child: TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Endereço',
                       filled: true,
                       border: InputBorder.none,
                     ),
                     onSaved: (value) {
-                      _address = value;
+                      address = value;
                     },
                   ),
                 ),
@@ -407,14 +409,14 @@ class _NavigationExampleState extends State<Dashboard>
                 Expanded(
                   flex: 1,
                   child: TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Número',
                       filled: true,
                       border: InputBorder.none,
                     ),
                     keyboardType: TextInputType.number,
                     onSaved: (value) {
-                      _number = value;
+                      number = value;
                     },
                   ),
                 ),
@@ -422,25 +424,25 @@ class _NavigationExampleState extends State<Dashboard>
             ),
             const SizedBox(height: 16),
             TextFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Cidade',
                 filled: true,
                 border: InputBorder.none,
               ),
               onSaved: (value) {
-                _city = value;
+                city = value;
               },
             ),
             const SizedBox(height: 16),
             TextFormField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Data de Nascimento',
                 filled: true,
                 border: InputBorder.none,
               ),
               keyboardType: TextInputType.datetime,
               onSaved: (value) {
-                _birthDate = value;
+                birthDate = value;
               },
             ),
             const SizedBox(height: 16),
@@ -450,33 +452,34 @@ class _NavigationExampleState extends State<Dashboard>
                 filled: true,
                 border: InputBorder.none,
               ),
-              value: _selectedGender,
+              value: selectedGender,
               items: const [
                 DropdownMenuItem(value: 'F', child: Text('Feminino')),
                 DropdownMenuItem(value: 'M', child: Text('Masculino')),
               ],
               onChanged: (value) {
-                _selectedGender = value;
+                selectedGender = value;
               },
             ),
             const SizedBox(height: 32),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: 80),
+                const SizedBox(height: 80),
                 Container(
                   margin: const EdgeInsets.symmetric(
                       horizontal: 20), // Margem de 20
                   child: ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        _formKey.currentState?.save();
-                        _presenter.onSave(_phone, _address, _number, _city,
-                            _birthDate, _selectedGender);
+                      if (formKey.currentState?.validate() ?? false) {
+                        formKey.currentState?.save();
+                        _presenter.onSave(phone, address, number, city,
+                            birthDate, selectedGender);
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      side: BorderSide(color: Colors.black), // Borda preta
+                      side:
+                          const BorderSide(color: Colors.black), // Borda preta
                       shape: RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.circular(0), // Formato quadrado
@@ -496,7 +499,8 @@ class _NavigationExampleState extends State<Dashboard>
                       _presenter.onLogout(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      side: BorderSide(color: Colors.black), // Borda preta
+                      side:
+                          const BorderSide(color: Colors.black), // Borda preta
                       shape: RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.circular(0), // Formato quadrado

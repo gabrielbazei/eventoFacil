@@ -1,6 +1,7 @@
 import 'package:eventofacil/model/event_model.dart';
 import 'package:eventofacil/view/event_view.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../view/login_view.dart';
 
@@ -61,7 +62,7 @@ class NavigationPresenter {
   List<Event> getEvents() => events;
   //Encaminha o usuario para a pagina de eventos passando
   void onCreateEvent(context) {
-    Event evento = new Event(isAdmin: true);
+    Event evento = Event(isAdmin: true);
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -71,9 +72,14 @@ class NavigationPresenter {
                 )));
   }
 
-  void onLogout(context) {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => LoginPage()));
+  Future<void> onLogout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
   }
 
   void onPasswordChage() {}

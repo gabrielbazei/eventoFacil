@@ -1,6 +1,3 @@
-import 'package:eventofacil/model/event_model.dart';
-import 'package:eventofacil/presenter/navigation_presenter.dart';
-
 class EventoDao {
   /*static final EventoDao instance = EventoDao._init();
 
