@@ -1,17 +1,17 @@
-import 'package:eventofacil/model/navigation_model.dart';
+import 'package:eventofacil/model/event_model.dart';
 import 'package:eventofacil/presenter/navigation_presenter.dart';
 import 'package:eventofacil/view/gerador_view.dart';
 import 'package:eventofacil/view/leitor_view.dart';
 import 'package:flutter/material.dart';
 
-class NavigationExample extends StatefulWidget {
-  const NavigationExample({super.key});
+class Dashboard extends StatefulWidget {
+  const Dashboard({super.key});
 
   @override
-  State<NavigationExample> createState() => _NavigationExampleState();
+  State<Dashboard> createState() => _NavigationExampleState();
 }
 
-class _NavigationExampleState extends State<NavigationExample>
+class _NavigationExampleState extends State<Dashboard>
     implements NavigationView {
   late NavigationPresenter _presenter;
 
@@ -22,28 +22,41 @@ class _NavigationExampleState extends State<NavigationExample>
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          _presenter.onPageSelected(index);
-        },
-        indicatorColor: Colors.amber,
-        selectedIndex: _presenter.currentPageIndex,
-        destinations: const <Widget>[
-          NavigationDestination(
-            selectedIcon: Icon(Icons.list),
-            icon: Icon(Icons.list_outlined),
-            label: 'Eventos',
+      bottomNavigationBar: Stack(
+        children: [
+          NavigationBar(
+            onDestinationSelected: (int index) {
+              _presenter.onPageSelected(index);
+            },
+            indicatorColor: Colors.transparent, // Torna o indicador invisível
+            selectedIndex: _presenter.currentPageIndex,
+            backgroundColor: Colors.blue, // Cor de fundo da NavigationBar
+            destinations: const <Widget>[
+              NavigationDestination(
+                icon: Icon(Icons.list_outlined, color: Colors.white),
+                label: '',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.wallet, color: Colors.white),
+                label: '',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.person, color: Colors.white),
+                label: '',
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.wallet),
-            label: 'Carteira',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person),
-            label: 'Meu perfil',
+          Positioned(
+            left: _presenter.currentPageIndex *
+                (MediaQuery.of(context).size.width / 3), // Ajusta a posição
+            bottom: 0,
+            child: Container(
+              width: MediaQuery.of(context).size.width / 3,
+              height: 4, // Altura do sublinhado
+              color: Colors.white, // Cor do sublinhado
+            ),
           ),
         ],
       ),
@@ -71,38 +84,37 @@ class _NavigationExampleState extends State<NavigationExample>
       margin: const EdgeInsets.all(8.0),
       child: SizedBox(
         child: Center(
-          child: Column(
+          child: Stack(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Área de eventos',
-                    maxLines: 1,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                    ),
+              Align(
+                alignment: Alignment.topRight,
+                child: Container(
+                  margin: const EdgeInsets.all(8.0),
+                  decoration: const BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
                   ),
-                  Container(
-                    margin:
-                        const EdgeInsets.only(right: 8.0), // Ajuste de margem
-                    decoration: const BoxDecoration(
-                        color: Colors.blue, shape: BoxShape.circle),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.add,
-                        color: Colors.black,
-                      ),
-                      onPressed: () {
-                        _presenter.onCreateEvent(context);
-                      },
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _presenter.onCreateEvent(context);
+                    },
+                  ),
+                ),
+              ),
+              Column(
+                children: [
+                  const SizedBox(height: 40),
+                  Expanded(
+                    child: ListView(
+                      children: _buildEventItems(events.cast<Event>()),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20), // Espaçamento entre o título e o menu
-              ..._buildEventItems(events.cast<Event>()),
             ],
           ),
         ),
@@ -126,36 +138,31 @@ class _NavigationExampleState extends State<NavigationExample>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    event.title,
+                    event.nomeEvento,
                     style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Color.fromARGB(
+                            255, 61, 61, 61) // Cor do texto para ciza
+                        ),
                   ),
                   const SizedBox(height: 8.0),
                   Text(
-                    event.description,
-                    style: const TextStyle(fontSize: 16),
+                    event.descricao,
+                    style: const TextStyle(
+                        fontSize: 16, color: Color.fromARGB(255, 61, 61, 61)),
                   ),
                   const SizedBox(height: 8.0),
-                  // Verifica se o usuário não está inscrito para exibir o botão "Participar"
-                  if (!event.isSubscribed) ...[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            _presenter.onJoinEvent(event);
-                          },
-                          child: const Text('Participar'),
-                        ),
-                      ],
-                    ),
-                  ],
-                  if (event.isAdmin && event.isSubscribed) ...[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Data: ${event.dataInicio.toIso8601String()}', // Exibe a data
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromARGB(255, 61, 61, 61)),
+                      ),
+                      if (event.isAdmin && event.isSubscribed) ...[
                         TextButton(
                           onPressed: () {
                             Navigator.push(
@@ -165,11 +172,50 @@ class _NavigationExampleState extends State<NavigationExample>
                               ),
                             );
                           },
-                          child: const Text('Abrir Leitor de QR Code'),
+                          child: const Text(
+                            'Abrir Leitor de QR Code',
+                            style:
+                                TextStyle(color: Colors.blue), // Botão em azul
+                          ),
                         ),
                       ],
-                    ),
-                  ],
+                      if (!event.isSubscribed) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                _presenter.onJoinEvent(event);
+                                // Exibe o dialog de confirmação
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Presença Confirmada'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // Fecha o diálogo
+                                          },
+                                          child: const Text('Ok'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              child: const Text(
+                                'Participar',
+                                style: TextStyle(color: Colors.blue),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                  //const SizedBox(height: 8.0),
                 ],
               ),
             ),
@@ -180,17 +226,12 @@ class _NavigationExampleState extends State<NavigationExample>
   }
 
   Widget _buildWallet() {
-    final events = _presenter
-        .getSubscribedEvents(); // Supondo que há um método que retorna os eventos em que o usuário está inscrito.
+    final events = _presenter.getSubscribedEvents();
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          const Text(
-            'Eventos Inscritos',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
           const SizedBox(height: 16),
           Expanded(
             child: ListView.builder(
@@ -205,7 +246,7 @@ class _NavigationExampleState extends State<NavigationExample>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          event.title,
+                          event.nomeEvento,
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -213,34 +254,97 @@ class _NavigationExampleState extends State<NavigationExample>
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          event.description,
+                          event.descricao,
                           style: const TextStyle(fontSize: 16),
                         ),
                         const SizedBox(height: 16),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                _presenter.onCancelEvent(event);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors
-                                    .red, // Cor diferenciada para o botão de cancelamento
+                            // Campo de data alinhado verticalmente
+                            Text(
+                              'Data: ${event.dataInicio.toIso8601String()}', // Exibe a data
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Color.fromARGB(255, 61, 61, 61),
                               ),
-                              child: const Text('Cancelar Ingresso'),
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                // Lógica para visualizar o QR Code do ingresso
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => GenerateQRCode(),
+                            Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    // Mostra o alerta de confirmação
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize
+                                                .min, // Garante que a coluna não ocupe muito espaço
+                                            children: [
+                                              const Text(
+                                                "Tem certeza que deseja cancelar a inscrição neste evento?",
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              const SizedBox(
+                                                height: 20,
+                                              ), // Espaço entre o título e os botões
+
+                                              TextButton(
+                                                child: const Text(
+                                                  'Cancelar Ingresso',
+                                                  style: TextStyle(
+                                                      color: Colors.red),
+                                                ),
+                                                onPressed: () {
+                                                  _presenter.onCancelEvent(
+                                                      event); // Chama o método de cancelamento
+                                                  Navigator.of(context)
+                                                      .pop(); // Fecha o diálogo
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: const Text(
+                                                  'Voltar',
+                                                  style: TextStyle(
+                                                      color: Colors.blue),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pop(); // Fecha o diálogo
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors
+                                        .red, // Cor do texto para o botão de cancelar
                                   ),
-                                );
-                              },
-                              child: const Text('Visualizar Ingresso'),
+                                  child: const Text('Cancelar Ingresso'),
+                                ),
+                                const SizedBox(
+                                    width: 8), // Espaço entre os botões
+                                TextButton(
+                                  onPressed: () {
+                                    // Lógica para visualizar o QR Code do ingresso
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => GenerateQRCode(),
+                                      ),
+                                    );
+                                  },
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors
+                                        .blue, // Cor do texto para o botão de visualizar ingresso
+                                  ),
+                                  child: const Text('Visualizar Ingresso'),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -273,9 +377,10 @@ class _NavigationExampleState extends State<NavigationExample>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextFormField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Telefone',
-                border: OutlineInputBorder(),
+                filled: true,
+                border: InputBorder.none,
               ),
               keyboardType: TextInputType.phone,
               onSaved: (value) {
@@ -288,9 +393,10 @@ class _NavigationExampleState extends State<NavigationExample>
                 Expanded(
                   flex: 3,
                   child: TextFormField(
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Endereço',
-                      border: OutlineInputBorder(),
+                      filled: true,
+                      border: InputBorder.none,
                     ),
                     onSaved: (value) {
                       _address = value;
@@ -301,9 +407,10 @@ class _NavigationExampleState extends State<NavigationExample>
                 Expanded(
                   flex: 1,
                   child: TextFormField(
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Número',
-                      border: OutlineInputBorder(),
+                      filled: true,
+                      border: InputBorder.none,
                     ),
                     keyboardType: TextInputType.number,
                     onSaved: (value) {
@@ -315,9 +422,10 @@ class _NavigationExampleState extends State<NavigationExample>
             ),
             const SizedBox(height: 16),
             TextFormField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Cidade',
-                border: OutlineInputBorder(),
+                filled: true,
+                border: InputBorder.none,
               ),
               onSaved: (value) {
                 _city = value;
@@ -325,9 +433,10 @@ class _NavigationExampleState extends State<NavigationExample>
             ),
             const SizedBox(height: 16),
             TextFormField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Data de Nascimento',
-                border: OutlineInputBorder(),
+                filled: true,
+                border: InputBorder.none,
               ),
               keyboardType: TextInputType.datetime,
               onSaved: (value) {
@@ -338,7 +447,8 @@ class _NavigationExampleState extends State<NavigationExample>
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(
                 labelText: 'Gênero',
-                border: OutlineInputBorder(),
+                filled: true,
+                border: InputBorder.none,
               ),
               value: _selectedGender,
               items: const [
@@ -353,36 +463,60 @@ class _NavigationExampleState extends State<NavigationExample>
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      _formKey.currentState?.save();
-                      // Salvar as informações aqui
-                      print(
-                          'Salvando informações: Telefone: $_phone, Endereço: $_address, Número: $_number, Cidade: $_city, Data de Nascimento: $_birthDate, Gênero: $_selectedGender');
-                    }
-                  },
-                  child: const Text('Salvar'),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // Lógica para sair do perfil
-                    print('Saindo...');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Colors.red, // Cor para diferenciar o botão de sair
+                SizedBox(height: 80),
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 20), // Margem de 20
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState?.validate() ?? false) {
+                        _formKey.currentState?.save();
+                        _presenter.onSave(_phone, _address, _number, _city,
+                            _birthDate, _selectedGender);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      side: BorderSide(color: Colors.black), // Borda preta
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(0), // Formato quadrado
+                      ),
+                    ),
+                    child: const Text(
+                      'Salvar',
+                      style: TextStyle(color: Colors.blue), // Texto azul
+                    ),
                   ),
-                  child: const Text('Sair'),
                 ),
-                const SizedBox(height: 8),
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 5), // Margem de 20
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _presenter.onLogout(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      side: BorderSide(color: Colors.black), // Borda preta
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(0), // Formato quadrado
+                      ),
+                    ),
+                    child: const Text(
+                      'Sair',
+                      style: TextStyle(color: Colors.red), // Texto vermelho
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 TextButton(
                   onPressed: () {
-                    // Lógica para alterar a senha
-                    print('Alterar Senha');
+                    _presenter.onPasswordChage();
                   },
-                  child: const Text('Alterar Senha'),
+                  child: const Text(
+                    'Alterar Senha',
+                    style: TextStyle(color: Colors.blue), // Texto azul
+                  ),
                 ),
               ],
             ),

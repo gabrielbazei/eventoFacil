@@ -1,4 +1,4 @@
-import '../model/navigation_model.dart';
+import '../model/event_model.dart';
 
 class EventoPresenter {
   final EventoView view;
@@ -17,11 +17,13 @@ class EventoPresenter {
 
   void apagarEvento() {
     // Lógica para apagar o evento
-    print("Evento apagado: ${evento.title}");
+    print("Evento apagado: ${evento.nomeEvento}");
     view.mostrarMensagem('Evento apagado com sucesso!');
   }
 
   void adicionarEvento() {}
+
+  void onEventDelete() {}
 }
 
 // Interface para que a View possa implementar

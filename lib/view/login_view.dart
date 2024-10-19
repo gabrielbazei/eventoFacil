@@ -23,41 +23,99 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Faça seu login'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(labelText: 'Login'),
-            ),
-            const SizedBox(height: 80),
-            TextField(
-              obscureText: true,
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Senha'),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () {
-                _presenter.validateLogin(
-                  _usernameController.text,
-                  _passwordController.text,
-                );
-              },
-              child: const Text('Login'),
-            ),
-          ],
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'Evento Facil',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[700],
+                ),
+              ),
+              const SizedBox(height: 32),
+              TextField(
+                controller: _usernameController,
+                style: const TextStyle(color: Colors.grey), // Texto cinza
+                decoration: const InputDecoration(
+                  labelText: 'CPF',
+                  labelStyle:
+                      TextStyle(color: Colors.grey), // Texto do label cinza
+                  border: UnderlineInputBorder(), // Apenas a margem inferior
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                obscureText: true,
+                controller: _passwordController,
+                style: const TextStyle(color: Colors.grey), // Texto cinza
+                decoration: const InputDecoration(
+                  labelText: 'Senha',
+                  labelStyle:
+                      TextStyle(color: Colors.grey), // Texto do label cinza
+                  border: UnderlineInputBorder(), // Apenas a margem inferior
+                ),
+              ),
+              const SizedBox(height: 84),
+              SizedBox(
+                width: double.infinity, // Faz o botão ocupar toda a largura
+                height: 60,
+                child: ElevatedButton(
+                  onPressed: () {
+                    _presenter.validateLogin(
+                      _usernameController.text,
+                      _passwordController.text,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(16.0),
+                    backgroundColor: Colors.blue,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero, // Deixa o botão quadrado
+                    ),
+                  ),
+                  child: const Text(
+                    'ENTRAR',
+                    style: TextStyle(
+                      color: Colors.white, // Define a cor do texto como branca
+                      fontSize: 18, // Tamanho da fonte (opcional)
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () {
+                  // Ação para "Esqueceu a senha?"
+                },
+                child: const Text(
+                  'Esqueceu a senha?',
+                  style: TextStyle(color: Colors.blue),
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text('ou'),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () {
+                  // Ação para "Cadastre-se"
+                },
+                child: const Text(
+                  'Cadastre-se',
+                  style: TextStyle(color: Colors.blue),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // Implementação dos métodos definidos pela interface LoginView
   @override
   void showLoginError() {
     showDialog(
@@ -83,7 +141,7 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
   void navigateToDashboard() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const NavigationExample()),
+      MaterialPageRoute(builder: (context) => const Dashboard()),
     );
   }
 }

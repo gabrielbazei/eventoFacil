@@ -14,8 +14,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      debugShowCheckedModeBanner: false, // Remove o banner de debug
       //home: const LoginPage(), // Define a tela de login como a tela inicial
-      home: const NavigationExample(),
+      home: const Dashboard(),
     );
   }
 }

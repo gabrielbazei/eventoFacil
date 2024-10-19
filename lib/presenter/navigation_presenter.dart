@@ -1,6 +1,8 @@
-import 'package:eventofacil/model/navigation_model.dart';
+import 'package:eventofacil/model/event_model.dart';
 import 'package:eventofacil/view/event_view.dart';
 import 'package:flutter/material.dart';
+
+import '../view/login_view.dart';
 
 abstract class NavigationView {
   void updateView(int index);
@@ -12,23 +14,7 @@ class NavigationPresenter {
 
   //Gera uma lista de eventos generica. Adicionando alguns atributos para simular
   //TODO: remover esta função assim que um SQL for criado.
-  List<Event> events = [
-    Event(
-        title: 'Evento 1',
-        description: 'Descrição do Evento 1',
-        isAdmin: true,
-        isSubscribed: true),
-    Event(
-        title: 'Evento 2',
-        description: 'Descrição do Evento 2',
-        isAdmin: false,
-        isSubscribed: false),
-    Event(
-        title: 'Evento 3',
-        description: 'Descrição do Evento 3',
-        isAdmin: false,
-        isSubscribed: true),
-  ];
+  List<Event> events = [];
 
   NavigationPresenter(this.view);
 
@@ -37,11 +23,6 @@ class NavigationPresenter {
     return events.where((event) => event.isSubscribed).toList();
   }
 
-  //TODO: remover função não utilizada
-  /*void onShowQrCode(Event event) {
-    print('Mostrar QR Code para ${event.title}');
-    // Lógica para exibir o QR Code para o evento
-  }*/
   //Função que serve para montar a estrutura de navegação da tela principal do APP
   void onPageSelected(int index) {
     //Utiliza o valor passado para atualizar pela chamada para atualizar a view.
@@ -61,17 +42,6 @@ class NavigationPresenter {
                 )));
   }
 
-  //TODO: remover função não utilizada
-  /*void onEditEvent(context, Event event) {
-    print('Editar ${event.title}');
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => EventoScreen(
-                  evento: event,
-                )));
-    // Aqui você pode adicionar a lógica para a edição do evento
-  }*/
   //Altera o valor do "isSubscribed" para true
   void onJoinEvent(Event event) {
     event.isSubscribed = true;
@@ -100,4 +70,14 @@ class NavigationPresenter {
                   isNew: true,
                 )));
   }
+
+  void onLogout(context) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => LoginPage()));
+  }
+
+  void onPasswordChage() {}
+
+  void onSave(String? phone, String? address, String? number, String? city,
+      String? birthDate, String? selectedGender) {}
 }
