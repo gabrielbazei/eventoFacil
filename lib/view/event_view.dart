@@ -78,7 +78,7 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
               ElevatedButton(
                 onPressed: criarEvento,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Color.fromRGBO(73, 149, 180, 1),
                   foregroundColor: Colors.white, // Cor do texto
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.zero),
@@ -90,7 +90,7 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
               ElevatedButton(
                 onPressed: presenter.salvarEvento,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Color.fromRGBO(73, 149, 180, 1),
                   foregroundColor: Colors.white, // Cor do texto
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.zero),
@@ -135,7 +135,7 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
   }
 
   void criarEvento() {
-    Event evento = Event(isAdmin: true, isSubscribed: true);
+    Event evento = Event(isAdmin: true);
     evento.nomeEvento = eventoController.text;
     evento.descricao = descricaoController.text;
     evento.local = localController.text;

@@ -3,6 +3,7 @@ import 'package:eventofacil/view/event_view.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../dao/evento_dao.dart';
 import '../view/login_view.dart';
 
 abstract class NavigationView {
@@ -21,7 +22,7 @@ class NavigationPresenter {
 
   //Função para retornar a lista de eventos inscritos para montar a carteira.
   List<Event> getSubscribedEvents() {
-    return events.where((event) => event.isSubscribed).toList();
+    return events.where((event) => event.isSubscribed == true).toList();
   }
 
   //Função que serve para montar a estrutura de navegação da tela principal do APP
@@ -59,7 +60,13 @@ class NavigationPresenter {
     //TODO: adicionar a função para remover do banco de dados
   }
 
-  List<Event> getEvents() => events;
+  Future<List<Event>> getEvents() async {
+    EventDAO eventDAO = EventDAO(); // Inicializando o eventDAO
+    Future<List<Event>> events = eventDAO
+        .listarEventos(); // Supondo que listarEventos() retorne uma List<Event>
+    return events;
+  }
+
   //Encaminha o usuario para a pagina de eventos passando
   void onCreateEvent(context) {
     Event evento = Event(isAdmin: true);

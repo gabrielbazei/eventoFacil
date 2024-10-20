@@ -25,4 +25,5 @@ class LoginPresenter {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getBool('isLoggedIn') ?? false;
   }
+  //test
 }

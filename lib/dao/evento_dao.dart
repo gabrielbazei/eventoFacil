@@ -1,82 +1,49 @@
-class EventoDao {
-  /*static final EventoDao instance = EventoDao._init();
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../model/event_model.dart';
 
-  static Database? _database;
+class EventDAO {
+  final String apiUrl = 'http://localhost:3000/events';
 
-  EventoDao._init();
-
-  Future<Database> get Database async {
-    if (_database != null) {
-      return _database!;
+  Future<List<Event>> listarEventos() async {
+    final response = await http.get(Uri.parse(apiUrl));
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      print(jsonResponse.map((event) => Event.fromMap(event)).toList());
+      return jsonResponse.map((event) => Event.fromMap(event)).toList();
+    } else {
+      throw Exception('Erro ao carregar eventos');
     }
-    _database = await _initDB('evento.db');
-    return _database!;
-  }
-
-  Future<Database> _initDB(String filepath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filepath);
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _createDB,
-    );
-  }
-
-  Future _createDB(Database db, int version) async {
-    await db.execute('''
-    CREATE TABLE evento(
-      idEvento INTEGER PRIMARY KEY AUTOINCREMENT,
-      nomeEvento TEXT NOT NULL,
-      descricao TEXT NOT NULL,
-      dataInicio TEXT NOT NULL,
-      dataFim TEXT,
-      local TEXT NOT NULL
-    )
-    ''');
   }
 
   Future<void> inserirEvento(Event evento) async {
-    final db = await instance.Database;
-    await db.insert(
-      'evento',
-      evento.toMap(), // Convertendo o objeto Evento para um mapa
-      conflictAlgorithm: ConflictAlgorithm.replace, // Para lidar com conflitos
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(evento.toMap()),
     );
-  }
-
-  Future<List<Event>> obterEventos() async {
-    final db = await instance.Database;
-    final List<Map<String, dynamic>> maps = await db.query('evento');
-
-    return List.generate(maps.length, (i) {
-      return Event(
-        idEvento: maps[i]['idEvento'],
-        nomeEvento: maps[i]['nomeEvento'],
-        descricao: maps[i]['descricao'],
-        dataInicio: maps[i]['dataInicio'],
-        dataFim: maps[i]['dataFim'],
-        local: maps[i]['local'],
-      );
-    });
+    if (response.statusCode != 201) {
+      throw Exception('Erro ao inserir evento');
+    }
   }
 
   Future<void> atualizarEvento(Event evento) async {
-    final db = await instance.Database;
-    await db.update(
-      'evento',
-      evento.toMap(),
-      where: 'idEvento = ?',
-      whereArgs: [evento.id],
+    final response = await http.put(
+      Uri.parse('$apiUrl/${evento.id}'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(evento.toMap()),
     );
+    if (response.statusCode != 200) {
+      throw Exception('Erro ao atualizar evento');
+    }
   }
 
-  Future<void> deletarEvento(int idEvento) async {
-    final db = await instance.Database;
-    await db.delete(
-      'evento',
-      where: 'idEvento = ?',
-      whereArgs: [idEvento],
+  Future<void> deletarEvento(int id) async {
+    final response = await http.delete(
+      Uri.parse('$apiUrl/$id'),
     );
-  }*/
+    if (response.statusCode != 200) {
+      throw Exception('Erro ao deletar evento');
+    }
+  }
 }

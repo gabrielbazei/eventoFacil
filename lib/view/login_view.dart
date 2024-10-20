@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue[700],
+                  color: Color.fromRGBO(73, 149, 180, 1),
                 ),
               ),
               const SizedBox(height: 32),
@@ -73,7 +73,7 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.all(16.0),
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Color.fromRGBO(73, 149, 180, 1),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.zero, // Deixa o botão quadrado
                     ),
@@ -94,7 +94,7 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
                 },
                 child: const Text(
                   'Esqueceu a senha?',
-                  style: TextStyle(color: Colors.blue),
+                  style: TextStyle(color: Color.fromRGBO(73, 149, 180, 1)),
                 ),
               ),
               const SizedBox(height: 8),
@@ -106,7 +106,7 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
                 },
                 child: const Text(
                   'Cadastre-se',
-                  style: TextStyle(color: Colors.blue),
+                  style: TextStyle(color: Color.fromRGBO(73, 149, 180, 1)),
                 ),
               ),
             ],

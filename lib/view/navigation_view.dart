@@ -32,7 +32,8 @@ class _NavigationExampleState extends State<Dashboard>
             },
             indicatorColor: Colors.transparent, // Torna o indicador invisível
             selectedIndex: _presenter.currentPageIndex,
-            backgroundColor: Colors.blue, // Cor de fundo da NavigationBar
+            backgroundColor: const Color.fromRGBO(73, 149, 180,
+                1), // Cor de fundo da NavigationBar rgba(73,149,180,255)
             destinations: const <Widget>[
               NavigationDestination(
                 icon: Icon(Icons.list_outlined, color: Colors.white),
@@ -78,7 +79,6 @@ class _NavigationExampleState extends State<Dashboard>
   }
 
   Widget _buildEventPage() {
-    final events = _presenter.getEvents();
     return Card(
       shadowColor: Colors.transparent,
       margin: const EdgeInsets.all(8.0),
@@ -91,7 +91,7 @@ class _NavigationExampleState extends State<Dashboard>
                 child: Container(
                   margin: const EdgeInsets.all(8.0),
                   decoration: const BoxDecoration(
-                    color: Colors.blue,
+                    color: Color.fromRGBO(73, 149, 180, 1),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
@@ -109,8 +109,25 @@ class _NavigationExampleState extends State<Dashboard>
                 children: [
                   const SizedBox(height: 40),
                   Expanded(
-                    child: ListView(
-                      children: _buildEventItems(events.cast<Event>()),
+                    child: FutureBuilder<List<Event>>(
+                      future: _presenter.getEvents(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return Center(child: Text('No events found.'));
+                        } else {
+                          return ListView(
+                            children:
+                                _buildEventItems(snapshot.data!.cast<Event>()),
+                          );
+                        }
+                      },
                     ),
                   ),
                 ],
@@ -162,7 +179,8 @@ class _NavigationExampleState extends State<Dashboard>
                             fontSize: 16,
                             color: Color.fromARGB(255, 61, 61, 61)),
                       ),
-                      if (event.isAdmin && event.isSubscribed) ...[
+                      if ((event.isAdmin ?? false) &&
+                          (event.isSubscribed ?? false)) ...[
                         TextButton(
                           onPressed: () {
                             Navigator.push(
@@ -175,12 +193,14 @@ class _NavigationExampleState extends State<Dashboard>
                           },
                           child: const Text(
                             'Abrir Leitor de QR Code',
-                            style:
-                                TextStyle(color: Colors.blue), // Botão em azul
+                            style: TextStyle(
+                              color: Color.fromRGBO(
+                                  73, 149, 180, 1), // Botão em azul
+                            ),
                           ),
                         ),
                       ],
-                      if (!event.isSubscribed) ...[
+                      if (!(event.isSubscribed ?? false)) ...[
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -208,7 +228,8 @@ class _NavigationExampleState extends State<Dashboard>
                               },
                               child: const Text(
                                 'Participar',
-                                style: TextStyle(color: Colors.blue),
+                                style: TextStyle(
+                                    color: Color.fromRGBO(73, 149, 180, 1)),
                               ),
                             ),
                           ],
@@ -308,7 +329,8 @@ class _NavigationExampleState extends State<Dashboard>
                                                 child: const Text(
                                                   'Voltar',
                                                   style: TextStyle(
-                                                      color: Colors.blue),
+                                                      color: Color.fromRGBO(
+                                                          73, 149, 180, 1)),
                                                 ),
                                                 onPressed: () {
                                                   Navigator.of(context)
@@ -487,7 +509,8 @@ class _NavigationExampleState extends State<Dashboard>
                     ),
                     child: const Text(
                       'Salvar',
-                      style: TextStyle(color: Colors.blue), // Texto azul
+                      style: TextStyle(
+                          color: Color.fromRGBO(73, 149, 180, 1)), // Texto azul
                     ),
                   ),
                 ),
@@ -519,7 +542,8 @@ class _NavigationExampleState extends State<Dashboard>
                   },
                   child: const Text(
                     'Alterar Senha',
-                    style: TextStyle(color: Colors.blue), // Texto azul
+                    style: TextStyle(
+                        color: Color.fromRGBO(73, 149, 180, 1)), // Texto azul
                   ),
                 ),
               ],

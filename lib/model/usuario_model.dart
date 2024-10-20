@@ -1,21 +1,26 @@
-class Event {
-  int? id;
-  String nomeEvento;
-  String descricao;
-  String local;
-  DateTime dataInicio;
-  DateTime? dataFim;
-  bool isAdmin; //Indica se o usuario é admin no evento
-  bool? isSubscribed; // Indica se o usuário está inscrito no evento
-  Event({
-    this.id = null,
-    this.nomeEvento = "",
-    this.descricao = "",
-    this.local = "",
-    this.isAdmin = false,
-    DateTime? dataInicio,
-    DateTime? dataFim,
-  }) : dataInicio = dataInicio ?? DateTime.now();
+class Usuario {
+  String nome;
+  String email;
+  String cpf;
+  String senha;
+  String telefone;
+  String endereco;
+  String numEndereco;
+  String cidade;
+  DateTime dataNascimento;
+  String genero;
+  Usuario({
+    this.nome = "",
+    this.email = "",
+    this.cpf = "",
+    this.senha = "",
+    this.telefone = "",
+    this.endereco = "",
+    this.numEndereco = "",
+    this.cidade = "",
+    this.genero = "",
+    DateTime? dataNascimento,
+  }) : dataNascimento = dataNascimento ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
     return {
