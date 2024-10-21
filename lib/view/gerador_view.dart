@@ -3,7 +3,8 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:eventofacil/presenter/gerador_presenter.dart';
 
 class GenerateQRCode extends StatefulWidget {
-  const GenerateQRCode({super.key});
+  final String hashQR;
+  const GenerateQRCode(String this.hashQR, {super.key});
 
   @override
   GenerateQRCodeState createState() => GenerateQRCodeState();
@@ -18,7 +19,7 @@ class GenerateQRCodeState extends State<GenerateQRCode>
   void initState() {
     super.initState();
     _presenter = GenerateQRCodePresenter(this);
-    _presenter.loadQRCode(); // Carrega o QR code inicial
+    _presenter.loadQRCode(widget.hashQR); // Carrega o QR code inicial
   }
 
   @override

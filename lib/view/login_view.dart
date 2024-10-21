@@ -1,6 +1,9 @@
 import 'package:eventofacil/presenter/login_presenter.dart';
 import 'package:eventofacil/view/navigation_view.dart';
+import 'package:eventofacil/view/troca_senha_view.dart';
 import 'package:flutter/material.dart';
+
+import 'cadastro_view.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -90,7 +93,11 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () {
-                  // Ação para "Esqueceu a senha?"
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const TrocaSenhaPage()),
+                  );
                 },
                 child: const Text(
                   'Esqueceu a senha?',
@@ -102,7 +109,11 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
               const SizedBox(height: 8),
               TextButton(
                 onPressed: () {
-                  // Ação para "Cadastre-se"
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const CadastroUsuarioPage()),
+                  );
                 },
                 child: const Text(
                   'Cadastre-se',
@@ -122,8 +133,9 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Senha incorreta'),
-          content: const Text("A senha digitada é incorreta, tente novamente!"),
+          title: const Text('Senha ou usuario incorreto'),
+          content: const Text(
+              "A senha ou usuario estão incorretos, informe novamente!"),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -138,10 +150,10 @@ class _LoginPageState extends State<LoginPage> implements LoginView {
   }
 
   @override
-  void navigateToDashboard() {
+  void navigateToDashboard(String login) {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const Dashboard()),
+      MaterialPageRoute(builder: (context) => Dashboard(login)),
     );
   }
 }

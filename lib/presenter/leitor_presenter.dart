@@ -34,11 +34,11 @@ class BarcodeScannerPresenter {
   }
 
   void navigateToDashboard(BuildContext context) {
-    Navigator.pushReplacement(
+    /*Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const Dashboard()),
     ).then((_) {
       _isProcessing = false; // Resetar o estado de processamento ao voltar
-    });
+    });*/
   }
 }

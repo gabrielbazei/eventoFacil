@@ -8,8 +8,14 @@ void main() async {
       .ensureInitialized(); // Necessário para usar SharedPreferences
   final prefs = await SharedPreferences.getInstance();
   final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-  runApp(MyApp(home: isLoggedIn ? const Dashboard() : const LoginPage()));
+  if (isLoggedIn) {
+    final String? cpf = prefs.getString('cpf');
+    if (cpf != null) {
+      runApp(MyApp(home: Dashboard(cpf)));
+    }
+  } else {
+    runApp(MyApp(home: const LoginPage()));
+  }
 }
 
 class MyApp extends StatelessWidget {

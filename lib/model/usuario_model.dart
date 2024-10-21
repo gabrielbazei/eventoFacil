@@ -1,4 +1,5 @@
 class Usuario {
+  int id;
   String nome;
   String email;
   String cpf;
@@ -10,6 +11,7 @@ class Usuario {
   DateTime dataNascimento;
   String genero;
   Usuario({
+    required this.id,
     this.nome = "",
     this.email = "",
     this.cpf = "",
@@ -25,24 +27,34 @@ class Usuario {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'nomeEvento': nomeEvento,
-      'descricao': descricao,
-      'local': local,
-      'dataInicio': dataInicio.toIso8601String(),
-      'dataFim': dataFim?.toIso8601String(),
-      'isAdmin': isAdmin ? 1 : 0,
+      'nome': nome,
+      'email': email,
+      'cpf': cpf,
+      'senha': senha,
+      'telefone': telefone,
+      'endereco': endereco,
+      'numEndereco': numEndereco,
+      'cidade': cidade,
+      'genero': genero,
+      'dataNascimento': dataNascimento.toIso8601String(),
     };
   }
 
-  factory Event.fromMap(Map<String, dynamic> map) {
-    return Event(
-      id: map['id'],
-      nomeEvento: map['nomeEvento'],
-      descricao: map['descricao'],
-      local: map['local'],
-      dataInicio: DateTime.parse(map['dataInicio']),
-      dataFim: map['dataFim'] != null ? DateTime.parse(map['dataFim']) : null,
-      isAdmin: map['isAdmin'] == 1,
+  factory Usuario.fromMap(Map<String, dynamic> map) {
+    return Usuario(
+      id: map['idUsuario'] ?? -1, // Ou outro valor padrão que você queira
+      nome: map['nome'] ?? "",
+      email: map['email'] ?? "",
+      cpf: map['cpf'] ?? "",
+      senha: map['senha'] ?? "",
+      telefone: map['telefone'] ?? "",
+      endereco: map['endereco'] ?? "",
+      numEndereco: map['numEndereco'] ?? "",
+      cidade: map['cidade'] ?? "",
+      genero: map['genero'] ?? "",
+      dataNascimento: map['dataNascimento'] != null
+          ? DateTime.parse(map['dataNascimento'])
+          : DateTime.now(),
     );
   }
 }

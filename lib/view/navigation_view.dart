@@ -1,11 +1,13 @@
 import 'package:eventofacil/model/event_model.dart';
+import 'package:eventofacil/model/usuario_model.dart';
 import 'package:eventofacil/presenter/navigation_presenter.dart';
 import 'package:eventofacil/view/gerador_view.dart';
 import 'package:eventofacil/view/leitor_view.dart';
 import 'package:flutter/material.dart';
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+  final String login;
+  const Dashboard(this.login, {super.key});
 
   @override
   State<Dashboard> createState() => _NavigationExampleState();
@@ -14,11 +16,16 @@ class Dashboard extends StatefulWidget {
 class _NavigationExampleState extends State<Dashboard>
     implements NavigationView {
   late NavigationPresenter _presenter;
+  late String _login;
 
   @override
   void initState() {
     super.initState();
+    _login = widget.login;
     _presenter = NavigationPresenter(this);
+    _presenter.load(_login);
+
+    _presenter.onPageSelected(0);
   }
 
   @override
@@ -174,13 +181,12 @@ class _NavigationExampleState extends State<Dashboard>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Data: ${event.dataInicio.toIso8601String()}', // Exibe a data
+                        'Data: ${_presenter.formataData(event.dataInicio)}', // Exibe a data
                         style: const TextStyle(
                             fontSize: 16,
                             color: Color.fromARGB(255, 61, 61, 61)),
                       ),
-                      if ((event.isAdmin ?? false) &&
-                          (event.isSubscribed ?? false)) ...[
+                      if (_presenter.checkAdmin(event.id)) ...[
                         TextButton(
                           onPressed: () {
                             Navigator.push(
@@ -200,7 +206,7 @@ class _NavigationExampleState extends State<Dashboard>
                           ),
                         ),
                       ],
-                      if (!(event.isSubscribed ?? false)) ...[
+                      if (!_presenter.checkExist(event.id)) ...[
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -248,7 +254,7 @@ class _NavigationExampleState extends State<Dashboard>
   }
 
   Widget _buildWallet() {
-    final events = _presenter.getSubscribedEvents();
+    final userEvents = _presenter.getSubscribedEvents();
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -257,9 +263,10 @@ class _NavigationExampleState extends State<Dashboard>
           const SizedBox(height: 16),
           Expanded(
             child: ListView.builder(
-              itemCount: events.length,
+              itemCount: userEvents.length,
               itemBuilder: (context, index) {
-                final event = events[index];
+                final userEvent = userEvents[index];
+                final Event event = _presenter.getEvent(userEvent.id);
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Padding(
@@ -285,7 +292,7 @@ class _NavigationExampleState extends State<Dashboard>
                           children: [
                             // Campo de data alinhado verticalmente
                             Text(
-                              'Data: ${event.dataInicio.toIso8601String()}', // Exibe a data
+                              'Data: ${_presenter.formataData(event.dataInicio)}', // Exibe a data,
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Color.fromARGB(255, 61, 61, 61),
@@ -319,8 +326,8 @@ class _NavigationExampleState extends State<Dashboard>
                                                       color: Colors.red),
                                                 ),
                                                 onPressed: () {
-                                                  _presenter.onCancelEvent(
-                                                      event); // Chama o método de cancelamento
+                                                  _presenter
+                                                      .onCancelEvent(); // Chama o método de cancelamento
                                                   Navigator.of(context)
                                                       .pop(); // Fecha o diálogo
                                                 },
@@ -358,7 +365,7 @@ class _NavigationExampleState extends State<Dashboard>
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            const GenerateQRCode(),
+                                            GenerateQRCode(userEvent.hashQR),
                                       ),
                                     );
                                   },
@@ -386,12 +393,23 @@ class _NavigationExampleState extends State<Dashboard>
 
   Widget _buildProfilePage() {
     final formKey = GlobalKey<FormState>();
-    String? phone;
-    String? address;
-    String? number;
-    String? city;
-    String? birthDate;
-    String? selectedGender;
+    Usuario user = _presenter.getUsuario();
+
+    // Controladores para os campos de texto
+    final TextEditingController phoneController =
+        TextEditingController(text: user.telefone);
+    final TextEditingController addressController =
+        TextEditingController(text: user.endereco);
+    final TextEditingController numberController =
+        TextEditingController(text: user.numEndereco);
+    final TextEditingController cityController =
+        TextEditingController(text: user.cidade);
+    final TextEditingController birthDateController = TextEditingController(
+        text: user.dataNascimento != null
+            ? '${user.dataNascimento!.toLocal()}'.split(' ')[0]
+            : '');
+
+    String? selectedGender = user.genero;
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -401,6 +419,7 @@ class _NavigationExampleState extends State<Dashboard>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextFormField(
+              controller: phoneController,
               decoration: const InputDecoration(
                 labelText: 'Telefone',
                 filled: true,
@@ -408,7 +427,7 @@ class _NavigationExampleState extends State<Dashboard>
               ),
               keyboardType: TextInputType.phone,
               onSaved: (value) {
-                phone = value;
+                phoneController.text = value ?? '';
               },
             ),
             const SizedBox(height: 16),
@@ -417,13 +436,14 @@ class _NavigationExampleState extends State<Dashboard>
                 Expanded(
                   flex: 3,
                   child: TextFormField(
+                    controller: addressController,
                     decoration: const InputDecoration(
                       labelText: 'Endereço',
                       filled: true,
                       border: InputBorder.none,
                     ),
                     onSaved: (value) {
-                      address = value;
+                      addressController.text = value ?? '';
                     },
                   ),
                 ),
@@ -431,6 +451,7 @@ class _NavigationExampleState extends State<Dashboard>
                 Expanded(
                   flex: 1,
                   child: TextFormField(
+                    controller: numberController,
                     decoration: const InputDecoration(
                       labelText: 'Número',
                       filled: true,
@@ -438,7 +459,7 @@ class _NavigationExampleState extends State<Dashboard>
                     ),
                     keyboardType: TextInputType.number,
                     onSaved: (value) {
-                      number = value;
+                      numberController.text = value ?? '';
                     },
                   ),
                 ),
@@ -446,25 +467,36 @@ class _NavigationExampleState extends State<Dashboard>
             ),
             const SizedBox(height: 16),
             TextFormField(
+              controller: cityController,
               decoration: const InputDecoration(
                 labelText: 'Cidade',
                 filled: true,
                 border: InputBorder.none,
               ),
               onSaved: (value) {
-                city = value;
+                cityController.text = value ?? '';
               },
             ),
             const SizedBox(height: 16),
             TextFormField(
+              controller: birthDateController,
               decoration: const InputDecoration(
                 labelText: 'Data de Nascimento',
                 filled: true,
                 border: InputBorder.none,
               ),
-              keyboardType: TextInputType.datetime,
-              onSaved: (value) {
-                birthDate = value;
+              readOnly: true, // Para evitar que o usuário digite manualmente
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: user.dataNascimento ?? DateTime.now(),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+                if (pickedDate != null) {
+                  birthDateController.text =
+                      '${pickedDate.toLocal()}'.split(' ')[0];
+                }
               },
             ),
             const SizedBox(height: 16),
@@ -495,8 +527,15 @@ class _NavigationExampleState extends State<Dashboard>
                     onPressed: () {
                       if (formKey.currentState?.validate() ?? false) {
                         formKey.currentState?.save();
-                        _presenter.onSave(phone, address, number, city,
-                            birthDate, selectedGender);
+                        _presenter.onSave(
+                          phoneController.text,
+                          addressController.text,
+                          numberController.text,
+                          cityController.text,
+                          DateTime.tryParse(birthDateController
+                              .text), // Converter texto para DateTime
+                          selectedGender,
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -538,7 +577,7 @@ class _NavigationExampleState extends State<Dashboard>
                 const SizedBox(height: 20),
                 TextButton(
                   onPressed: () {
-                    _presenter.onPasswordChage();
+                    _presenter.onPasswordChage(context);
                   },
                   child: const Text(
                     'Alterar Senha',

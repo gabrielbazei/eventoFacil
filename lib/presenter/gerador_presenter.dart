@@ -8,10 +8,8 @@ class GenerateQRCodePresenter {
   GenerateQRCodePresenter(this.view);
 
   // Método para obter o QR code (pode ser estendido para buscar de um servidor, etc.)
-  void loadQRCode() {
+  void loadQRCode(String id) {
     // Simula a recuperação do ID do aluno
-    //TODO: buscar informações do banco para buscar o ID necessario do QRCODE
-    String id = '123';
     view.updateQRCode(id);
   }
 }

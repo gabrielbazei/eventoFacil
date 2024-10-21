@@ -9,7 +9,6 @@ class EventDAO {
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
-      print(jsonResponse.map((event) => Event.fromMap(event)).toList());
       return jsonResponse.map((event) => Event.fromMap(event)).toList();
     } else {
       throw Exception('Erro ao carregar eventos');

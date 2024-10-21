@@ -5,11 +5,13 @@ import '../presenter/event_presenter.dart';
 class EventoScreen extends StatefulWidget {
   final Event evento;
   final bool isNew;
+  final String isAdmin;
 
   const EventoScreen({
     super.key,
     required this.evento,
     required this.isNew,
+    required this.isAdmin,
   });
 
   @override
@@ -18,8 +20,9 @@ class EventoScreen extends StatefulWidget {
 
 class _EventoScreenState extends State<EventoScreen> implements EventoView {
   late EventoPresenter presenter;
+  late bool admin;
+  late Event evento;
 
-  // Controladores de texto para os campos do formulário
   final TextEditingController eventoController = TextEditingController();
   final TextEditingController localController = TextEditingController();
   final TextEditingController descricaoController = TextEditingController();
@@ -30,7 +33,8 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
   void initState() {
     super.initState();
     presenter = EventoPresenter(widget.evento, this);
-    presenter.carregarEvento();
+    evento = presenter.carregarEvento();
+    admin = widget.isAdmin == "1";
   }
 
   @override
@@ -45,33 +49,99 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
           children: [
             TextField(
               controller: eventoController,
-              enabled: widget.evento.isAdmin,
-              decoration: const InputDecoration(labelText: 'Evento'),
+              enabled: admin,
+              decoration: InputDecoration(
+                labelText: 'Evento',
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.5)),
+                ),
+              ),
               style: const TextStyle(color: Colors.grey),
             ),
+            const SizedBox(height: 16),
             TextField(
               controller: localController,
-              enabled: widget.evento.isAdmin,
-              decoration: const InputDecoration(labelText: 'Local'),
+              enabled: admin,
+              decoration: InputDecoration(
+                labelText: 'Local',
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.5)),
+                ),
+              ),
               style: const TextStyle(color: Colors.grey),
             ),
+            const SizedBox(height: 16),
             TextField(
               controller: descricaoController,
-              enabled: widget.evento.isAdmin,
-              decoration: const InputDecoration(labelText: 'Descrição'),
+              enabled: admin,
+              maxLines: 3, // Permite pelo menos 3 linhas
+              decoration: InputDecoration(
+                labelText: 'Descrição',
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey.withOpacity(0.5)),
+                ),
+              ),
               style: const TextStyle(color: Colors.grey),
             ),
-            TextField(
-              controller: dataInicioController,
-              enabled: widget.evento.isAdmin,
-              decoration: const InputDecoration(labelText: 'Data Início'),
-              style: const TextStyle(color: Colors.grey),
-            ),
-            TextField(
-              controller: dataFimController,
-              enabled: widget.evento.isAdmin,
-              decoration: const InputDecoration(labelText: 'Data Fim'),
-              style: const TextStyle(color: Colors.grey),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: dataInicioController,
+                    enabled: admin,
+                    decoration: InputDecoration(
+                      labelText: 'Data de início',
+                      border: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Colors.grey.withOpacity(0.5)),
+                      ),
+                    ),
+                    readOnly: true,
+                    onTap: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: evento.dataInicio ?? DateTime.now(),
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime(2030),
+                      );
+                      if (pickedDate != null) {
+                        dataInicioController.text =
+                            '${pickedDate.toLocal()}'.split(' ')[0];
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                if (evento.dataFim != null || admin || widget.isNew) ...[
+                  Expanded(
+                    child: TextFormField(
+                      controller: dataFimController,
+                      enabled: admin,
+                      decoration: InputDecoration(
+                        labelText: 'Data de finalização',
+                        border: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.grey.withOpacity(0.5)),
+                        ),
+                      ),
+                      readOnly: true,
+                      onTap: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: evento.dataFim ?? DateTime.now(),
+                          firstDate: DateTime(1900),
+                          lastDate: DateTime(2030),
+                        );
+                        if (pickedDate != null) {
+                          dataFimController.text =
+                              '${pickedDate.toLocal()}'.split(' ')[0];
+                        }
+                      },
+                    ),
+                  ),
+                ]
+              ],
             ),
             const SizedBox(height: 20),
             if (widget.isNew) ...[
@@ -79,19 +149,19 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
                 onPressed: criarEvento,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromRGBO(73, 149, 180, 1),
-                  foregroundColor: Colors.white, // Cor do texto
+                  foregroundColor: Colors.white,
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.zero),
                   padding: const EdgeInsets.all(16),
                 ),
                 child: const Text('Salvar'),
               ),
-            ] else if (widget.evento.isAdmin && !widget.isNew) ...[
+            ] else if (!widget.isNew && admin) ...[
               ElevatedButton(
                 onPressed: presenter.salvarEvento,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromRGBO(73, 149, 180, 1),
-                  foregroundColor: Colors.white, // Cor do texto
+                  foregroundColor: Colors.white,
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.zero),
                   padding: const EdgeInsets.all(16),
@@ -103,7 +173,7 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
                 onPressed: presenter.onEventDelete,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
-                  foregroundColor: Colors.white, // Cor do texto
+                  foregroundColor: Colors.white,
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.zero),
                   padding: const EdgeInsets.all(16),
@@ -123,8 +193,9 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
       eventoController.text = evento.nomeEvento;
       localController.text = evento.local;
       descricaoController.text = evento.descricao;
-      dataInicioController.text = widget.evento.dataInicio.toIso8601String();
-      dataFimController.text = widget.evento.dataFim.toString();
+      dataInicioController.text =
+          presenter.formataData(widget.evento.dataInicio);
+      dataFimController.text = presenter.formataData(widget.evento.dataFim);
     });
   }
 
@@ -135,7 +206,7 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
   }
 
   void criarEvento() {
-    Event evento = Event(isAdmin: true);
+    Event evento = Event();
     evento.nomeEvento = eventoController.text;
     evento.descricao = descricaoController.text;
     evento.local = localController.text;
