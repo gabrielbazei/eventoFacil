@@ -24,51 +24,64 @@ class _NavigationExampleState extends State<Dashboard>
     _login = widget.login;
     _presenter = NavigationPresenter(this);
     _presenter.load(_login);
-
-    _presenter.onPageSelected(0);
+    updateView(0);
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: Stack(
-        children: [
-          NavigationBar(
-            onDestinationSelected: (int index) {
-              _presenter.onPageSelected(index);
-            },
-            indicatorColor: Colors.transparent, // Torna o indicador invisível
-            selectedIndex: _presenter.currentPageIndex,
-            backgroundColor: const Color.fromRGBO(73, 149, 180,
-                1), // Cor de fundo da NavigationBar rgba(73,149,180,255)
-            destinations: const <Widget>[
-              NavigationDestination(
-                icon: Icon(Icons.list_outlined, color: Colors.white),
-                label: '',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.wallet, color: Colors.white),
-                label: '',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.person, color: Colors.white),
-                label: '',
-              ),
-            ],
-          ),
-          Positioned(
-            left: _presenter.currentPageIndex *
-                (MediaQuery.of(context).size.width / 3), // Ajusta a posição
-            bottom: 0,
-            child: Container(
-              width: MediaQuery.of(context).size.width / 3,
-              height: 4, // Altura do sublinhado
-              color: Colors.white, // Cor do sublinhado
+    return FutureBuilder<void>(
+      future: _presenter.load(_login),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else {
+          return Scaffold(
+            bottomNavigationBar: Stack(
+              children: [
+                NavigationBar(
+                  onDestinationSelected: (int index) {
+                    _presenter.onPageSelected(index);
+                  },
+                  indicatorColor:
+                      Colors.transparent, // Torna o indicador invisível
+                  selectedIndex: _presenter.currentPageIndex,
+                  backgroundColor: const Color.fromRGBO(73, 149, 180,
+                      1), // Cor de fundo da NavigationBar rgba(73,149,180,255)
+                  destinations: const <Widget>[
+                    NavigationDestination(
+                      icon: Icon(Icons.list_outlined, color: Colors.white),
+                      label: '',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.wallet, color: Colors.white),
+                      label: '',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.person, color: Colors.white),
+                      label: '',
+                    ),
+                  ],
+                ),
+                Positioned(
+                  left: _presenter.currentPageIndex *
+                      (MediaQuery.of(context).size.width /
+                          3), // Ajusta a posição
+                  bottom: 0,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width / 3,
+                    height: 4, // Altura do sublinhado
+                    color: Colors.white, // Cor do sublinhado
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-      body: _getSelectedPage(),
+            body: _getSelectedPage(),
+          );
+        }
+      },
     );
   }
 
@@ -93,24 +106,44 @@ class _NavigationExampleState extends State<Dashboard>
         child: Center(
           child: Stack(
             children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  margin: const EdgeInsets.all(8.0),
-                  decoration: const BoxDecoration(
-                    color: Color.fromRGBO(73, 149, 180, 1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.add,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      _presenter.onCreateEvent(context);
-                    },
-                  ),
-                ),
+              FutureBuilder<bool>(
+                future: _presenter.isOrganizador(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(); // Show loading indicator
+                  } else if (snapshot.hasError) {
+                    return Center(
+                        child: Text(
+                            'Error: ${snapshot.error}')); // Show error message
+                  } else {
+                    bool isOrganizador = snapshot.data ?? false;
+                    return isOrganizador
+                        ? Align(
+                            alignment: Alignment.topRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 10.0,
+                                  right: 8.0), // Adjust the padding as needed
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: Color.fromRGBO(73, 149, 180, 1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.add,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    _presenter.onCreateEvent(context);
+                                  },
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(); // Return an empty container if not an organizer
+                  }
+                },
               ),
               Column(
                 children: [
@@ -127,7 +160,8 @@ class _NavigationExampleState extends State<Dashboard>
                               child: Text('Error: ${snapshot.error}'));
                         } else if (!snapshot.hasData ||
                             snapshot.data!.isEmpty) {
-                          return Center(child: Text('No events found.'));
+                          return Center(
+                              child: Text('Nenhum evento encontrado.'));
                         } else {
                           return ListView(
                             children:
@@ -192,8 +226,9 @@ class _NavigationExampleState extends State<Dashboard>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const BarcodeScannerSimple(),
+                                builder: (context) => BarcodeScannerSimple(
+                                  cpf: widget.login,
+                                ),
                               ),
                             );
                           },
@@ -212,25 +247,8 @@ class _NavigationExampleState extends State<Dashboard>
                           children: [
                             TextButton(
                               onPressed: () {
-                                _presenter.onJoinEvent(event);
+                                _presenter.onJoinEvent(event, context);
                                 // Exibe o dialog de confirmação
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text('Presença Confirmada'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context)
-                                                .pop(); // Fecha o diálogo
-                                          },
-                                          child: const Text('Ok'),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
                               },
                               child: const Text(
                                 'Participar',
@@ -266,7 +284,7 @@ class _NavigationExampleState extends State<Dashboard>
               itemCount: userEvents.length,
               itemBuilder: (context, index) {
                 final userEvent = userEvents[index];
-                final Event event = _presenter.getEvent(userEvent.id);
+                final Event event = _presenter.getEvent(userEvent.idEvento);
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Padding(
@@ -326,8 +344,9 @@ class _NavigationExampleState extends State<Dashboard>
                                                       color: Colors.red),
                                                 ),
                                                 onPressed: () {
-                                                  _presenter
-                                                      .onCancelEvent(); // Chama o método de cancelamento
+                                                  _presenter.onCancelEvent(
+                                                      userEvent,
+                                                      context); // Chama o método de cancelamento
                                                   Navigator.of(context)
                                                       .pop(); // Fecha o diálogo
                                                 },
@@ -396,6 +415,10 @@ class _NavigationExampleState extends State<Dashboard>
     Usuario user = _presenter.getUsuario();
 
     // Controladores para os campos de texto
+    final TextEditingController nomeController =
+        TextEditingController(text: user.nome);
+    final TextEditingController emailController =
+        TextEditingController(text: user.email);
     final TextEditingController phoneController =
         TextEditingController(text: user.telefone);
     final TextEditingController addressController =
@@ -418,6 +441,30 @@ class _NavigationExampleState extends State<Dashboard>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            TextFormField(
+              controller: nomeController,
+              decoration: const InputDecoration(
+                labelText: 'nome',
+                filled: true,
+                border: InputBorder.none,
+              ),
+              onSaved: (value) {
+                nomeController.text = value ?? '';
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: emailController,
+              decoration: const InputDecoration(
+                labelText: 'email',
+                filled: true,
+                border: InputBorder.none,
+              ),
+              onSaved: (value) {
+                emailController.text = value ?? '';
+              },
+            ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: phoneController,
               decoration: const InputDecoration(
@@ -528,6 +575,9 @@ class _NavigationExampleState extends State<Dashboard>
                       if (formKey.currentState?.validate() ?? false) {
                         formKey.currentState?.save();
                         _presenter.onSave(
+                          context,
+                          nomeController.text,
+                          emailController.text,
                           phoneController.text,
                           addressController.text,
                           numberController.text,

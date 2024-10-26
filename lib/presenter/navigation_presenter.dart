@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+
 import 'package:eventofacil/dao/usuario_dao.dart';
 import 'package:eventofacil/model/event_model.dart';
 import 'package:eventofacil/model/usuario_event_model.dart';
@@ -29,12 +32,14 @@ class NavigationPresenter {
     if (user?.id != null) {
       userEvent = await UsuarioEventDAO().listarEventosPorUsuario(user!.id);
     }
+    //view.updateView(currentPageIndex);
   }
 
   //Função para retornar a lista de eventos inscritos para montar a carteira.
   List<Usuarioevent> getSubscribedEvents() {
     List<Usuarioevent> temp = [];
     for (Usuarioevent evento in userEvent) {
+      print(evento.toMap());
       if (evento.idUsuario == user?.id) {
         temp.add(evento); // Retorna verdadeiro se o usuário é admin
       }
@@ -54,7 +59,7 @@ class NavigationPresenter {
   void onEventSelected(context, Event event) {
     String isAdmin = "0";
     for (Usuarioevent evento in userEvent) {
-      if (evento.id == event.id) {
+      if (evento.idEvento == event.id) {
         isAdmin = evento.isAdmin;
       }
     }
@@ -62,6 +67,8 @@ class NavigationPresenter {
         context,
         MaterialPageRoute(
             builder: (context) => EventoScreen(
+                  cpf: user!.cpf,
+                  id: user!.id,
                   evento: event,
                   isNew: false,
                   isAdmin: isAdmin,
@@ -69,19 +76,35 @@ class NavigationPresenter {
   }
 
   //Altera o valor do "isSubscribed" para true
-  void onJoinEvent(Event event) {
-    //event.isSubscribed = true;
-    // Atualiza a visualização para refletir a alteração
+  Future<void> onJoinEvent(Event event, context) async {
+    Usuarioevent usuarioEvent = Usuarioevent(
+        idUsuario: user!.id,
+        idEvento: event.id ?? -1,
+        hashQR: "0",
+        isAdmin: "0"); // Cria um novo Usuarioevent
+    String input = user!.cpf + event.id.toString(); // Concatena o cpf e o id
+    var bytes = utf8.encode(input); // Converte a string para bytes
+    var digest = sha256.convert(bytes); // Gera a hash SHA-256
+    usuarioEvent.hashQR = digest.toString();
+    int codigo = await UsuarioEventDAO().inserirUsuarioEvent(usuarioEvent);
+    if (codigo == 200) {
+      _showAlert(
+          context, "Sucesso", "Você se inscreveu no evento com sucesso!");
+    } else {
+      _showAlert(context, "Erro", "Ocorreu um erro ao se inscrever no evento.");
+    }
     view.updateView(currentPageIndex);
-    //TODO: adicionar a função para inserir no banco de dados
   }
 
   //Altera o valor do "isSubscribed" para false
-  void onCancelEvent() {
-    //event.isSubscribed = false;
-    // Atualiza a visualização para refletir a alteração
+  void onCancelEvent(Usuarioevent evento, context) async {
+    int codigo = await UsuarioEventDAO().deletarUsuarioEvent(evento.id ?? -1);
+    if (codigo == 200) {
+      _showAlert(context, "Sucesso", "Você cancelou a inscrição no evento!");
+    } else {
+      _showAlert(context, "Erro", "Ocorreu um erro ao cancelar a inscrição.");
+    }
     view.updateView(currentPageIndex);
-    //TODO: adicionar a função para remover do banco de dados
   }
 
   Future<List<Event>> getEvents() async {
@@ -97,6 +120,8 @@ class NavigationPresenter {
         context,
         MaterialPageRoute(
             builder: (context) => EventoScreen(
+                  cpf: user!.cpf,
+                  id: user!.id,
                   evento: Event(),
                   isNew: true,
                   isAdmin: "1",
@@ -119,22 +144,40 @@ class NavigationPresenter {
         MaterialPageRoute(builder: (context) => const TrocaSenhaPage()));
   }
 
-  void onSave(String? phone, String? address, String? number, String? city,
-      DateTime? birthDate, String? selectedGender) {
+  Future<void> onSave(
+      context,
+      String? nome,
+      String? email,
+      String? phone,
+      String? address,
+      String? number,
+      String? city,
+      DateTime? birthDate,
+      String? selectedGender) async {
+    int codigo = 0;
     if (user != null &&
+        nome != null &&
+        email != null &&
         phone != null &&
         address != null &&
         number != null &&
         city != null &&
         birthDate != null &&
         selectedGender != null) {
+      user?.nome = nome;
+      user?.email = email;
       user?.telefone = phone;
       user?.endereco = address;
       user?.numEndereco = number;
       user?.cidade = city;
       user?.dataNascimento = birthDate;
       user?.genero = selectedGender;
-      UsuarioDAO().atualizarUsuario(user!);
+      codigo = await UsuarioDAO().atualizarUsuario(user!);
+      if (codigo == 200) {
+        _showAlert(context, 'Sucesso', 'Os dados foram salvos com sucesso!');
+      } else {
+        _showAlert(context, 'Erro', 'Ocorreu um erro ao salvar os dados.');
+      }
     }
     view.updateView(currentPageIndex);
   }
@@ -179,5 +222,37 @@ class NavigationPresenter {
     return user ??
         (throw Exception(
             "Usuario não encontrado")); // Lança exceção se user for nulo
+  }
+
+  void _showAlert(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<bool> isOrganizador() async {
+    if (user?.id == -1) {
+      await load(
+          user!.cpf); // Carrega os dados do usuário se não estiverem carregados
+    }
+    if (user?.isOrganizador == "1") {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

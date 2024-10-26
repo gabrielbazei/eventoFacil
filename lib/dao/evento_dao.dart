@@ -15,20 +15,27 @@ class EventDAO {
     }
   }
 
-  Future<void> inserirEvento(Event evento) async {
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(evento.toMap()),
-    );
-    if (response.statusCode != 201) {
-      throw Exception('Erro ao inserir evento');
+  Future<String> inserirEvento(Event evento) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$apiUrl/inserirEvento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(evento.toMap()),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('DAO: Erro ao inserir evento');
+      }
+      return response.body;
+    } catch (e) {
+      print('Erro: $e');
+      rethrow;
     }
   }
 
   Future<void> atualizarEvento(Event evento) async {
     final response = await http.put(
-      Uri.parse('$apiUrl/${evento.id}'),
+      Uri.parse('$apiUrl/update/${evento.id}'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(evento.toMap()),
     );

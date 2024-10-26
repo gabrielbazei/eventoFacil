@@ -10,6 +10,7 @@ class Usuario {
   String cidade;
   DateTime dataNascimento;
   String genero;
+  String isOrganizador;
   Usuario({
     required this.id,
     this.nome = "",
@@ -21,6 +22,7 @@ class Usuario {
     this.numEndereco = "",
     this.cidade = "",
     this.genero = "",
+    this.isOrganizador = "0",
     DateTime? dataNascimento,
   }) : dataNascimento = dataNascimento ?? DateTime.now();
 
@@ -36,6 +38,7 @@ class Usuario {
       'numEndereco': numEndereco,
       'cidade': cidade,
       'genero': genero,
+      'isOrganizador': isOrganizador,
       'dataNascimento': dataNascimento.toIso8601String(),
     };
   }
@@ -52,6 +55,7 @@ class Usuario {
       numEndereco: map['numEndereco'] ?? "",
       cidade: map['cidade'] ?? "",
       genero: map['genero'] ?? "",
+      isOrganizador: map['isOrganizador'] ?? "0",
       dataNascimento: map['dataNascimento'] != null
           ? DateTime.parse(map['dataNascimento'])
           : DateTime.now(),

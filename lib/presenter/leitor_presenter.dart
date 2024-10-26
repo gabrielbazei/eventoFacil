@@ -1,3 +1,5 @@
+import 'package:eventofacil/dao/usuario_event_dao.dart';
+import 'package:eventofacil/model/usuario_event_model.dart';
 import 'package:eventofacil/view/navigation_view.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -9,10 +11,11 @@ abstract class BarcodeScannerView {
 
 class BarcodeScannerPresenter {
   final BarcodeScannerView view;
+  final String cpf;
   Barcode? _currentBarcode;
   bool _isProcessing = false; // Adicionado para controlar leituras múltiplas
 
-  BarcodeScannerPresenter(this.view);
+  BarcodeScannerPresenter(this.view, this.cpf);
 
   // Método chamado quando um novo código QR é detectado
   void handleBarcode(BarcodeCapture barcodes, BuildContext context) {
@@ -22,23 +25,52 @@ class BarcodeScannerPresenter {
     if (_currentBarcode != null) {
       _isProcessing = true; // Marcar como processando
       view.updateBarcodeDisplay(_currentBarcode?.displayValue);
-      salvarCodigo(_currentBarcode?.displayValue);
+      salvarCodigo(_currentBarcode?.displayValue, context);
       navigateToDashboard(context);
     }
   }
 
   // Método para salvar o código (pode ser expandido para persistência no futuro)
-  void salvarCodigo(String? codigo) {
-    //TODO enviar o codigo vindo do leitor para o banco
-    print('Código salvo: $codigo');
+  Future<void> salvarCodigo(String? codigo, context) async {
+    if (codigo == null) return;
+    List<Usuarioevent> usuarioevent =
+        await UsuarioEventDAO().listarEventosPorHash(codigo);
+    if (usuarioevent.isNotEmpty) {
+      Usuarioevent ue = usuarioevent.first;
+      if (ue.dataEntrada == null) {
+        ue.dataEntrada = DateTime.now();
+        await UsuarioEventDAO().atualizarUsuarioEvent(ue);
+      } else if (ue.dataSaida == null) {
+        ue.dataSaida = DateTime.now();
+        await UsuarioEventDAO().atualizarUsuarioEvent(ue);
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Uusário já saiu do evento"),
+              content: Text("O usuário já saiu do evento."),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
   }
 
   void navigateToDashboard(BuildContext context) {
-    /*Navigator.pushReplacement(
+    Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const Dashboard()),
+      MaterialPageRoute(builder: (context) => Dashboard(cpf)),
     ).then((_) {
       _isProcessing = false; // Resetar o estado de processamento ao voltar
-    });*/
+    });
   }
 }

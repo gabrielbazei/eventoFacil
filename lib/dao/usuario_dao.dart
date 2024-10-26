@@ -17,7 +17,7 @@ class UsuarioDAO {
 
   Future<Usuario?> buscarUsuarioPorCpf(String cpf) async {
     final response = await http.get(Uri.parse('$apiUrl?cpf=$cpf'));
-    print(response.statusCode);
+
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
       if (jsonResponse.isNotEmpty) {
@@ -42,7 +42,7 @@ class UsuarioDAO {
     }
   }
 
-  Future<void> atualizarUsuario(Usuario usuario) async {
+  Future<int> atualizarUsuario(Usuario usuario) async {
     final response = await http.put(
       Uri.parse('$apiUrl/update/${usuario.id}'),
       headers: {'Content-Type': 'application/json'},
@@ -51,6 +51,7 @@ class UsuarioDAO {
     if (response.statusCode != 200) {
       throw Exception('Erro ao atualizar usuário');
     }
+    return response.statusCode;
   }
 
   Future<void> deletarUsuario(int id) async {

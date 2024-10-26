@@ -1,17 +1,22 @@
 import 'package:eventofacil/model/event_model.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../presenter/event_presenter.dart';
 
 class EventoScreen extends StatefulWidget {
   final Event evento;
   final bool isNew;
   final String isAdmin;
+  final String cpf;
+  final int id;
 
   const EventoScreen({
     super.key,
+    required this.cpf,
     required this.evento,
     required this.isNew,
     required this.isAdmin,
+    required this.id,
   });
 
   @override
@@ -28,6 +33,8 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
   final TextEditingController descricaoController = TextEditingController();
   final TextEditingController dataInicioController = TextEditingController();
   final TextEditingController dataFimController = TextEditingController();
+
+  final DateFormat dateFormat = DateFormat('dd/MM/yyyy HH:mm');
 
   @override
   void initState() {
@@ -106,8 +113,21 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
                         lastDate: DateTime(2030),
                       );
                       if (pickedDate != null) {
-                        dataInicioController.text =
-                            '${pickedDate.toLocal()}'.split(' ')[0];
+                        TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+                        );
+                        if (pickedTime != null) {
+                          final DateTime fullDateTime = DateTime(
+                            pickedDate.year,
+                            pickedDate.month,
+                            pickedDate.day,
+                            pickedTime.hour,
+                            pickedTime.minute,
+                          );
+                          dataInicioController.text =
+                              dateFormat.format(fullDateTime);
+                        }
                       }
                     },
                   ),
@@ -134,8 +154,21 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
                           lastDate: DateTime(2030),
                         );
                         if (pickedDate != null) {
-                          dataFimController.text =
-                              '${pickedDate.toLocal()}'.split(' ')[0];
+                          TimeOfDay? pickedTime = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+                          );
+                          if (pickedTime != null) {
+                            final DateTime fullDateTime = DateTime(
+                              pickedDate.year,
+                              pickedDate.month,
+                              pickedDate.day,
+                              pickedTime.hour,
+                              pickedTime.minute,
+                            );
+                            dataFimController.text =
+                                dateFormat.format(fullDateTime);
+                          }
                         }
                       },
                     ),
@@ -146,7 +179,7 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
             const SizedBox(height: 20),
             if (widget.isNew) ...[
               ElevatedButton(
-                onPressed: criarEvento,
+                onPressed: () => criarEvento(widget.isNew),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromRGBO(73, 149, 180, 1),
                   foregroundColor: Colors.white,
@@ -154,11 +187,11 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
                       borderRadius: BorderRadius.zero),
                   padding: const EdgeInsets.all(16),
                 ),
-                child: const Text('Salvar'),
+                child: const Text('Criar Evento'),
               ),
             ] else if (!widget.isNew && admin) ...[
               ElevatedButton(
-                onPressed: presenter.salvarEvento,
+                onPressed: () => criarEvento(widget.isNew),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromRGBO(73, 149, 180, 1),
                   foregroundColor: Colors.white,
@@ -170,7 +203,8 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
               ),
               const SizedBox(height: 10),
               ElevatedButton(
-                onPressed: presenter.onEventDelete,
+                onPressed: () =>
+                    presenter.onEventDelete(evento, context, widget.cpf),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
@@ -205,11 +239,29 @@ class _EventoScreenState extends State<EventoScreen> implements EventoView {
         .showSnackBar(SnackBar(content: Text(mensagem)));
   }
 
-  void criarEvento() {
-    Event evento = Event();
-    evento.nomeEvento = eventoController.text;
-    evento.descricao = descricaoController.text;
-    evento.local = localController.text;
-    presenter.adicionarEvento();
+  void criarEvento(bool isNew) {
+    try {
+      if (dataInicioController.text.isEmpty) {
+        mostrarMensagem('Por favor, preencha a data de início.');
+        return;
+      }
+      Event evento = Event();
+      evento.nomeEvento = eventoController.text;
+      evento.descricao = descricaoController.text;
+      evento.local = localController.text;
+      evento.dataInicio = dateFormat.parseStrict(dataInicioController.text);
+      evento.dataFim = dataFimController.text.isNotEmpty
+          ? dateFormat.parseStrict(dataFimController.text)
+          : dateFormat.parseStrict(dataInicioController.text);
+      if (isNew) {
+        presenter.adicionarEvento(context, evento, widget.cpf, widget.id);
+      } else {
+        evento.id = widget.evento.id;
+        presenter.salvarEvento(evento, context, widget.cpf);
+      }
+    } catch (e) {
+      mostrarMensagem('Formato de data inválido, erro: $e');
+      print(e);
+    }
   }
 }

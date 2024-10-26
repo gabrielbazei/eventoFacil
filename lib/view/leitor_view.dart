@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class BarcodeScannerSimple extends StatefulWidget {
-  const BarcodeScannerSimple({super.key});
+  final String cpf;
+  const BarcodeScannerSimple({super.key, required this.cpf});
 
   @override
   BarcodeScannerSimpleState createState() => BarcodeScannerSimpleState();
@@ -12,12 +13,13 @@ class BarcodeScannerSimple extends StatefulWidget {
 class BarcodeScannerSimpleState extends State<BarcodeScannerSimple>
     implements BarcodeScannerView {
   late BarcodeScannerPresenter _presenter;
+
   String? _barcodeValue;
 
   @override
   void initState() {
     super.initState();
-    _presenter = BarcodeScannerPresenter(this);
+    _presenter = BarcodeScannerPresenter(this, widget.cpf);
   }
 
   @override

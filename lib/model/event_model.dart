@@ -12,7 +12,8 @@ class Event {
     this.local = "",
     DateTime? dataInicio,
     DateTime? dataFim,
-  }) : dataInicio = dataInicio ?? DateTime.now();
+  })  : dataInicio = dataInicio ?? DateTime.now(),
+        dataFim = dataFim;
 
   Map<String, dynamic> toMap() {
     return {
