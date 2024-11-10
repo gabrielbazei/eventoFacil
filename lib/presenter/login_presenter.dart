@@ -11,14 +11,14 @@ class LoginPresenter {
   final LoginView view;
 
   LoginPresenter(this.view);
-
+  //Valida o login do usuario
   void validateLogin(String username, String password) async {
     UsuarioDAO usuarioDAO = UsuarioDAO();
 
     Usuario? user = await usuarioDAO.buscarUsuarioPorCpf(username);
     if (user != null) {
       if (username == user.cpf && password == user.senha) {
-        // Salva o estado do login
+        // Salva o estado do login no SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('cpf', username);

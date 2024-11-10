@@ -1,5 +1,5 @@
 import '../model/usuario_model.dart';
-import '../dao/usuario_dao.dart'; // Certifique-se de importar o UsuarioDAO
+import '../dao/usuario_dao.dart';
 
 abstract class CadastroUsuarioView {
   void mostrarMensagem(String mensagem);
@@ -7,10 +7,9 @@ abstract class CadastroUsuarioView {
 
 class CadastroUsuarioPresenter {
   final CadastroUsuarioView view;
-  final UsuarioDAO usuarioDAO; // Adicionando o DAO
-
+  final UsuarioDAO usuarioDAO;
   CadastroUsuarioPresenter(this.view) : usuarioDAO = UsuarioDAO();
-
+  // Método para cadastrar usuário no banco de dados pegando diversas informações
   void cadastrarUsuario(
     String nome,
     String email,
@@ -38,7 +37,7 @@ class CadastroUsuarioPresenter {
       view.mostrarMensagem('Por favor, preencha todos os campos.');
       return;
     }
-
+    // Validação de senha
     if (senha != confirmaSenha) {
       view.mostrarMensagem('As senhas não coincidem.');
       return;
@@ -58,7 +57,7 @@ class CadastroUsuarioPresenter {
       genero: genero,
       senha: senha,
     );
-
+    // Inserção do usuário no banco de dados
     try {
       await usuarioDAO.inserirUsuario(novoUsuario);
       view.mostrarMensagem('Cadastro realizado com sucesso!');

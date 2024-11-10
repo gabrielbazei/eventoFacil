@@ -30,13 +30,15 @@ class BarcodeScannerPresenter {
     }
   }
 
-  // Método para salvar o código (pode ser expandido para persistência no futuro)
+  // Método para salvar o código lido no banco de dados
   Future<void> salvarCodigo(String? codigo, context) async {
     if (codigo == null) return;
     List<Usuarioevent> usuarioevent =
         await UsuarioEventDAO().listarEventosPorHash(codigo);
+    // Verificar se o usuário já entrou e/ou saiu do evento
     if (usuarioevent.isNotEmpty) {
       Usuarioevent ue = usuarioevent.first;
+      // Atualizar a data de entrada ou saída do usuário
       if (ue.dataEntrada == null) {
         ue.dataEntrada = DateTime.now();
         await UsuarioEventDAO().atualizarUsuarioEvent(ue);

@@ -33,6 +33,7 @@ class _NavigationExampleState extends State<Dashboard>
     return FutureBuilder<void>(
       future: _presenter.load(_login),
       builder: (context, snapshot) {
+        // Verifica se há erro ou se está carregando
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
@@ -85,6 +86,7 @@ class _NavigationExampleState extends State<Dashboard>
     );
   }
 
+// Método para retornar a página selecionada
   Widget _getSelectedPage() {
     switch (_presenter.currentPageIndex) {
       case 0:
@@ -98,6 +100,7 @@ class _NavigationExampleState extends State<Dashboard>
     }
   }
 
+  // Método para construir a página de eventos
   Widget _buildEventPage() {
     return Card(
       shadowColor: Colors.transparent,
@@ -109,6 +112,7 @@ class _NavigationExampleState extends State<Dashboard>
               FutureBuilder<bool>(
                 future: _presenter.isOrganizador(),
                 builder: (context, snapshot) {
+                  // Verifica se há erro ou se está carregando
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator(); // Show loading indicator
                   } else if (snapshot.hasError) {
@@ -180,6 +184,7 @@ class _NavigationExampleState extends State<Dashboard>
     );
   }
 
+  // Método para construir os itens de evento
   List<Widget> _buildEventItems(List<Event> events) {
     return events.map((event) {
       return Container(
@@ -220,6 +225,8 @@ class _NavigationExampleState extends State<Dashboard>
                             fontSize: 16,
                             color: Color.fromARGB(255, 61, 61, 61)),
                       ),
+                      // Botões de ação
+                      // Verifica se o usuário é admin e mostra o botão de leitor de QR Code
                       if (_presenter.checkAdmin(event.id)) ...[
                         TextButton(
                           onPressed: () {
@@ -241,6 +248,7 @@ class _NavigationExampleState extends State<Dashboard>
                           ),
                         ),
                       ],
+                      // Verifica se o usuário não está inscrito e mostra o botão de participar
                       if (!_presenter.checkExist(event.id)) ...[
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -271,6 +279,7 @@ class _NavigationExampleState extends State<Dashboard>
     }).toList();
   }
 
+  // Método para construir a carteira
   Widget _buildWallet() {
     final userEvents = _presenter.getSubscribedEvents();
 
@@ -410,6 +419,7 @@ class _NavigationExampleState extends State<Dashboard>
     );
   }
 
+// Método para construir a página de perfil
   Widget _buildProfilePage() {
     final formKey = GlobalKey<FormState>();
     Usuario user = _presenter.getUsuario();
@@ -540,6 +550,7 @@ class _NavigationExampleState extends State<Dashboard>
                   firstDate: DateTime(1900),
                   lastDate: DateTime.now(),
                 );
+                // Atualiza o campo de texto com a data selecionada
                 if (pickedDate != null) {
                   birthDateController.text =
                       '${pickedDate.toLocal()}'.split(' ')[0];
@@ -572,6 +583,7 @@ class _NavigationExampleState extends State<Dashboard>
                       horizontal: 20), // Margem de 20
                   child: ElevatedButton(
                     onPressed: () {
+                      // Validação do formulário
                       if (formKey.currentState?.validate() ?? false) {
                         formKey.currentState?.save();
                         _presenter.onSave(

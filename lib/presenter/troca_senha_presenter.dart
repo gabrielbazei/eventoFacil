@@ -9,7 +9,7 @@ class TrocaSenhaPresenter {
   final TrocaSenhaView view; // Change this to TrocaSenhaView
 
   TrocaSenhaPresenter(this.view);
-
+  // Método para trocar a senha do usuário
   Future<void> trocarSenha(String cpf, String cidade, String endereco,
       String senha, String confirmaSenha) async {
     if (cpf.isEmpty ||
@@ -21,7 +21,7 @@ class TrocaSenhaPresenter {
           'Todos os campos são obrigatórios.'); // Use view to call mostrarMensagem
       return;
     }
-
+    // Validação de senha
     if (senha != confirmaSenha) {
       view.mostrarMensagem(
           'As senhas não coincidem.'); // Use view to call mostrarMensagem

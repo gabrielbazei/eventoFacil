@@ -7,7 +7,9 @@ void main() async {
   WidgetsFlutterBinding
       .ensureInitialized(); // Necessário para usar SharedPreferences
   final prefs = await SharedPreferences.getInstance();
+
   final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  // Verifica se o usuário já está logado
   if (isLoggedIn) {
     final String? cpf = prefs.getString('cpf');
     if (cpf != null) {

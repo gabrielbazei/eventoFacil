@@ -7,7 +7,7 @@ class GenerateQRCodePresenter {
 
   GenerateQRCodePresenter(this.view);
 
-  // Método para obter o QR code (pode ser estendido para buscar de um servidor, etc.)
+  // Método para obter o QR code
   void loadQRCode(String id) {
     // Simula a recuperação do ID do aluno
     view.updateQRCode(id);

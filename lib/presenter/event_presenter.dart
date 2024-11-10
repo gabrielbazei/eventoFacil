@@ -1,9 +1,7 @@
 import 'dart:convert';
-
 import 'package:crypto/crypto.dart';
 import 'package:eventofacil/dao/evento_dao.dart';
 import 'package:eventofacil/model/usuario_event_model.dart';
-import 'package:eventofacil/model/usuario_model.dart';
 import 'package:eventofacil/view/navigation_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +20,7 @@ class EventoPresenter {
     return evento;
   }
 
+  //Salva o evento no banco de dados
   void salvarEvento(Event evento, BuildContext context, String cpf) {
     if (evento.id != null) {
       EventDAO().atualizarEvento(evento);
@@ -32,20 +31,20 @@ class EventoPresenter {
     }
   }
 
+  //Adiciona um evento no banco de dados
   Future<void> adicionarEvento(
       context, Event evento, String cpf, int id) async {
     int codigouserevent = 200;
     Usuarioevent usuarioevent = Usuarioevent(
       idUsuario: id,
       idEvento: 0, // Inicialmente 0, será atualizado depois
-      isAdmin: '1',
+      isAdmin: '1', // O usuário que cria o evento é automaticamente admin
       hashQR: cpf,
     );
 
     // Inserir evento e obter a resposta
     final response = await EventDAO().inserirEvento(evento);
     final responseBody = jsonDecode(response);
-
     // Pegar o id do evento criado
     final int eventId = responseBody['id'];
     usuarioevent.idEvento = eventId;
@@ -55,7 +54,7 @@ class EventoPresenter {
     usuarioevent.hashQR = digest.toString();
     // Inserir usuario_evento
     codigouserevent = await UsuarioEventDAO().inserirUsuarioEvent(usuarioevent);
-
+    // Verificar se o evento foi criado com sucesso
     if (codigouserevent == 200) {
       _showAlert(context, 'Sucesso', 'O evento foi criado com sucesso!');
       Navigator.push(
@@ -65,6 +64,7 @@ class EventoPresenter {
     }
   }
 
+  //Deleta um evento do banco de dados
   void onEventDelete(Event evento, BuildContext context, String cpf) {
     if (evento.id != null) {
       EventDAO().deletarEvento(evento.id!);
@@ -75,6 +75,7 @@ class EventoPresenter {
     }
   }
 
+  //Formata a data para o padrão brasileiro
   String formataData(DateTime? data) {
     if (data != null) {
       final DateFormat formatter = DateFormat('dd/MM/yyyy HH:mm');
@@ -85,6 +86,7 @@ class EventoPresenter {
     }
   }
 
+  //Mostra um alerta na tela
   void _showAlert(BuildContext context, String title, String message) {
     showDialog(
       context: context,
