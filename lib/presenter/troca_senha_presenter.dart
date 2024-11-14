@@ -1,5 +1,4 @@
 import 'package:eventofacil/dao/usuario_dao.dart';
-import 'package:eventofacil/view/troca_senha_view.dart';
 
 abstract class TrocaSenhaView {
   void mostrarMensagem(String mensagem);

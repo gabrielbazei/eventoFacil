@@ -220,7 +220,8 @@ class _NavigationExampleState extends State<Dashboard>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Data: ${_presenter.formataData(event.dataInicio)}', // Exibe a data
+                        _presenter
+                            .formataData(event.dataInicio), // Exibe a data
                         style: const TextStyle(
                             fontSize: 16,
                             color: Color.fromARGB(255, 61, 61, 61)),
@@ -319,13 +320,14 @@ class _NavigationExampleState extends State<Dashboard>
                           children: [
                             // Campo de data alinhado verticalmente
                             Text(
-                              'Data: ${_presenter.formataData(event.dataInicio)}', // Exibe a data,
+                              _presenter.formataData(
+                                  event.dataInicio), // Exibe a data,
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Color.fromARGB(255, 61, 61, 61),
                               ),
                             ),
-                            Row(
+                            Column(
                               children: [
                                 TextButton(
                                   onPressed: () {
@@ -577,7 +579,7 @@ class _NavigationExampleState extends State<Dashboard>
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 80),
+                const SizedBox(height: 30),
                 Container(
                   margin: const EdgeInsets.symmetric(
                       horizontal: 20), // Margem de 20
